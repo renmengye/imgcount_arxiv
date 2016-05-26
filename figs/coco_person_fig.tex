@@ -1,0 +1,20 @@
+\newcommand{\cocoPersonImg}[1] {
+\includegraphics[width=0.133\textwidth,height=0.085\textwidth]{./figs/coco_person_img/#1.jpg} &
+\includegraphics[width=0.133\textwidth,height=0.085\textwidth]{./figs/coco_person_gt/#1.png} &
+\includegraphics[width=0.133\textwidth,height=0.085\textwidth]{./figs/coco_person_out/#1.png}}
+
+\begin{figure}
+\centering
+\begin{small}
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{ccccccc}
+Image & GT & Ours & & Image & GT & Ours \\
+\cocoPersonImg{000000062060} & & \cocoPersonImg{000000058539} \\
+\\
+\cocoPersonImg{000000549299} & & \cocoPersonImg{000000082981} \\
+\end{tabular}
+}
+\caption{Examples of our instance segmentation output on MS-COCO person images.}
+\label{fig:coco_person_out}
+\end{small}
+\end{figure}

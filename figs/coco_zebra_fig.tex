@@ -1,0 +1,24 @@
+\newcommand{\cocoZebraImgH}[1] {
+\includegraphics[width=0.15\textwidth, height=0.09\textwidth]{./figs/coco_zebra_img/#1.jpg} &
+\includegraphics[width=0.15\textwidth, height=0.09\textwidth]{./figs/coco_zebra_gt/#1.png} &
+\includegraphics[width=0.15\textwidth, height=0.09\textwidth]{./figs/coco_zebra_out/#1.png}}
+\newcommand{\cocoZebraImgV}[1] {
+\includegraphics[width=0.15\textwidth, height=0.22\textwidth]{./figs/coco_zebra_img/#1.jpg} &
+\includegraphics[width=0.15\textwidth, height=0.22\textwidth]{./figs/coco_zebra_gt/#1.png} &
+\includegraphics[width=0.15\textwidth, height=0.22\textwidth]{./figs/coco_zebra_out/#1.png}}
+
+\begin{figure}
+\centering
+\begin{small}
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{ccccccc}
+Image & GT & Ours & & Image & GT & Ours \\
+\cocoZebraImgH{000000064359} & & \cocoZebraImgH{000000014820} \\
+\\
+\cocoZebraImgV{000000393805} & & \cocoZebraImgV{000000070158} \\
+\end{tabular}
+}
+\caption{Examples of our instance segmentation output on MS-COCO zebra images.}
+\label{fig:coco_zebra_out}
+\end{small}
+\end{figure}

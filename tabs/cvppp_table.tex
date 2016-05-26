@@ -1,0 +1,57 @@
+\begin{table}
+\begin{minipage}[t]{.48\textwidth}
+% \begin{minipage}[t]{1.0\textwidth}
+\caption{Leaf segmentation and counting performance}
+\label{tab:cvppp}
+\centering
+\begin{small}
+
+% \resizebox{1.0\columnwidth}{!}{
+\begin{tabular}{l|ll}
+\toprule
+\toprule
+                                  & \*{SBD} \u     & \*{|DiC|} \d    \\
+\midrule
+RIS+CRF \cite{romeraparedes15ris} & 66.6 (8.7)     & 1.1 (0.9)       \\
+MSU \cite{scharr16leaf}           & 66.7 (7.6)     & 2.3 (1.6)       \\
+Nottingham \cite{scharr16leaf}    & 68.3 (6.3)     & 3.8 (2.0)       \\
+Wageningen \cite{yin14leaf}       & 71.1 (6.2)     & 2.2 (1.6)       \\
+IPK \cite{pape14ipk}              & 74.4 (4.3)     & 2.6 (1.8)       \\
+PRIAn \cite{giuffrida15count}     & -              & 1.3(1.2)        \\
+\midrule
+Ours (FCN + Canvas)               & 79.3 (9.2)     & 0.9 (1.0)       \\
+Ours (FCN + ConvLSTM)             & 80.4 (8.9)     & 1.0 (0.8)       \\
+Ours (Canvas)                     & \*{84.9} (4.8) & \*{0.8} (1.0)   \\
+\bottomrule
+\end{tabular}
+% }
+\end{small}
+% \end{table}
+% }
+\end{minipage}
+\qquad
+\begin{minipage}[t]{.48\textwidth}
+\label{tab:vqa}
+\caption{Counting performance on MS-COCO}
+\centering
+\begin{small}
+\begin{tabular}{l|lll}
+\toprule
+\toprule
+                                     & \*{Category} & \*{MWCov} \u  & \*{|DiC|} \d \\
+\midrule
+detect \cite{chattopadhyay16count}   & Person       & -             & 3.22     \\
+aso-sub \cite{chattopadhyay16count}  & Person       & -             & \*{1.36} \\
+\midrule
+Ours                                 & Person       & 48.3          & 2.09     \\
+\midrule
+\midrule
+detect \cite{chattopadhyay16count}   & Zebra        & -             & 2.56     \\
+aso-sub \cite{chattopadhyay16count}  & Zebra        & -             & 1.03     \\
+\midrule
+Ours                                 & Zebra        & 65.3          & \*{0.85} \\
+\bottomrule
+\end{tabular}
+\end{small}
+\end{minipage}
+\end{table}

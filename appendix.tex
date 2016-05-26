@@ -1,0 +1,214 @@
+\appendix
+
+% \section{Additional model output}
+
+% We show additional model output in Figure~\ref{fig:kitti_out2},
+% \ref{fig:cvppp_out2}
+
+% \newcommand{\kittiImg}[1] {
+% \includegraphics[width=0.3\textwidth]{./figs/kitti_img/#1.png} &
+% \includegraphics[width=0.3\textwidth]{./figs/kitti_gt/#1.png} &
+% \includegraphics[width=0.3\textwidth]{./figs/kitti_out/#1.png}}
+
+% \begin{figure}
+% \centering
+% \begin{small}
+% \resizebox{\columnwidth}{!}{
+% \begin{tabular}{ccc}
+% Image & GT & Ours \\
+% \kittiImg{005057} \\
+% \kittiImg{004369} \\
+% \end{tabular}
+% }
+% \caption{Examples of our instance segmentation output on KITTI}
+% \label{fig:kitti_out2}
+% \end{small}
+% \end{figure}
+
+% \newcommand{\cvpppImg}[1] {
+% \includegraphics[width=0.133\textwidth]{./figs/cvppp_img/plant#1_rgb.png} &
+% \includegraphics[width=0.133\textwidth]{./figs/cvppp_gt/plant#1_label.png} &
+% \includegraphics[width=0.133\textwidth]{./figs/cvppp_out/plant#1_label.png}}
+
+% \begin{figure}
+% \centering
+% \begin{small}
+% \resizebox{\columnwidth}{!}{
+% \begin{tabular}{ccc|ccc}
+% Image & GT & Ours & Image & GT & Ours \\
+% \cvpppImg{042} & \cvpppImg{119}\\
+% \end{tabular}
+% }
+% \caption{Examples of our instance segmentation output on CVPPP.}
+% \label{fig:cvppp_out2}
+% \end{small}
+% \end{figure}
+
+\section{Training procedure specification} 
+
+We used Adam optimizer with learning rate 0.001. Learning rate is multiplied by
+0.85 for every 5000 steps of training.
+
+\section{Model architecture}
+
+\subsection{Foreground + Orientation FCN}
+
+We resize the image to uniform size. For CVPPP and MS-COCO dataset, we adopt a
+uniform size of $224\times224$, and for KITTI, we adopt $128\times448$.
+Table~\ref{tab:fcn_spec} lists the specification of all layers.
+
+\begin{table}[h!]
+\caption{FCN specification}
+\label{tab:fcn_spec}
+\centering
+
+\resizebox{\columnwidth}{!}{
+\begin{small}
+\begin{tabular}{cccccc}
+Name       & Type   & Input                & Spec (size/stride)             & Size CVPPP/MS-COCO      & Size KITTI             \\
+input      & input  & -                    & -                              & $224\times224\times3$   & $128\times448\times3$  \\
+conv1-1    & conv   & input                & $3\times3\times3\times32$      & $224\times224\times32$  & $128\times448\times64$ \\
+conv1-2    & conv   & conv1-1              & $3\times3\times32\times64$     & $224\times224\times64$  & $128\times448\times32$ \\
+pool1      & pool   & conv1-2              & max $2\times2$                 & $112\times112\times64$  & $64\times224\times64$  \\
+conv2-1    & conv   & pool1                & $3\times3\times64\times64$     & $112\times112\times64$  & $64\times224\times64$  \\
+conv2-2    & conv   & conv2-1              & $3\times3\times64\times96$     & $112\times112\times96$  & $64\times224\times96$  \\
+pool2      & pool   & conv2-2              & max $2\times2$                 & $56\times56\times96$    & $32\times112\times96$  \\
+conv3-1    & conv   & pool2                & $3\times3\times96\times96$     & $56\times56\times96$    & $32\times112\times96$  \\
+conv3-2    & conv   & conv3-1              & $3\times3\times96\times128$    & $56\times56\times128$   & $32\times112\times128$ \\
+pool3      & pool   & conv3-2              & max $2\times2$                 & $28\times28\times128$   & $16\times56\times128$  \\
+conv4-1    & conv   & pool3                & $3\times3\times128\times128$   & $28\times28\times128$   & $16\times56\times128$  \\
+conv4-2    & conv   & conv4-1              & $3\times3\times128\times128$   & $28\times28\times128$   & $16\times56\times128$  \\
+conv4-3    & conv   & conv4-2              & $3\times3\times128\times128$   & $28\times28\times128$   & $16\times56\times128$  \\
+conv4-4    & conv   & conv4-3              & $3\times3\times128\times128$   & $28\times28\times128$   & $16\times56\times128$  \\
+conv4-5    & conv   & conv4-4              & $3\times3\times128\times128$   & $28\times28\times128$   & $16\times56\times128$  \\
+conv4-6    & conv   & conv4-5              & $3\times3\times128\times128$   & $28\times28\times128$   & $16\times56\times128$  \\
+conv4-7    & conv   & conv4-6              & $3\times3\times128\times128$   & $28\times28\times128$   & $16\times56\times128$  \\
+conv4-8    & conv   & conv4-7              & $3\times3\times128\times256$   & $28\times28\times256$   & $16\times56\times256$  \\
+pool4      & pool   & conv4-8              & max $2\times2$                 & $14\times14\times256$   & $8\times28\times256$   \\
+conv5-1    & conv   & pool4                & $3\times3\times256\times256$   & $14\times14\times256$   & $8\times28\times256$   \\
+conv5-2    & conv   & conv5-1              & $3\times3\times256\times256$   & $14\times14\times256$   & $8\times28\times256$   \\
+conv5-3    & conv   & conv5-2              & $3\times3\times256\times256$   & $14\times14\times256$   & $8\times28\times256$   \\
+conv5-4    & conv   & conv5-3              & $3\times3\times256\times512$   & $14\times14\times512$   & $8\times28\times512$   \\
+pool5      & pool   & conv5-4              & max $2\times2$                 & $7\times7\times512$     & $4\times14\times512$   \\
+deconv6-1  & deconv & pool5                & $3\times3\times256\times512/2$ & $14\times14\times256$   & $8\times28\times256$   \\
+deconv6-2  & deconv & deconv6-1 + conv5-3  & $3\times3\times256\times512$   & $14\times14\times256$   & $8\times28\times256$   \\
+deconv7-1  & deconv & deconv6-2            & $3\times3\times128\times256/2$ & $28\times28\times128$   & $16\times56\times128$  \\
+deconv7-2  & deconv & deconv7-1 + conv4-7  & $3\times3\times128\times256$   & $28\times28\times128$   & $16\times56\times128$  \\
+deconv8-1  & deconv & deconv7-2            & $3\times3\times96\times128/2$  & $56\times56\times96$    & $32\times112\times96$  \\
+deconv8-2  & deconv & deconv8-1 + conv3-1  & $3\times3\times96\times192$    & $56\times56\times96$    & $32\times112\times96$  \\
+deconv9-1  & deconv & deconv8-2            & $3\times3\times64\times96/2$   & $112\times112\times64$  & $64\times224\times64$  \\
+deconv9-2  & deconv & deconv9-1            & $3\times3\times64\times64$     & $112\times112\times64$  & $64\times224\times64$  \\
+deconv10-1 & deconv & deconv9-2            & $3\times3\times32\times64/2$   & $224\times224\times32$  & $128\times448\times32$ \\
+deconv10-2 & deconv & deconv10-1           & $3\times3\times32\times32$     & $224\times224\times32$  & $128\times448\times32$ \\
+deconv10-3 & deconv & deconv10-2 + input   & $3\times3\times9\times35$      & $224\times224\times9$   & $128\times448\times9$  \\
+\end{tabular}
+\end{small}
+}
+\end{table}
+
+\subsection{External memory}
+
+\begin{table}[h!]
+\caption{External memory specification}
+\label{tab:ext_mem_spec}
+\centering
+\begin{small}
+\begin{tabular}{cccccc}
+Name       & Filter spec     & Size CVPPP/MS-COCO     & Size KITTI            \\
+ConvLSTM   & $3\times3$      & $224\times224\times9$  & $128\times448\times9$ \\
+\end{tabular}
+\end{small}
+\end{table}
+
+\subsection{Box network}
+
+The box network takes in 9 channel input. Either directly from the output of
+the FCN, or from the hidden state of the ConvLSTM. It goes through a CNN
+structure again and uses the attention vector predicted by the LSTM to perform
+dynamic pooling in the last layer. The CNN hyperparameters are listed in
+Table~\ref{tab:box_cnn_spec} and the LSTM and glimpse MLP hyperparameters are
+listed in Table~\ref{tab:box_lstm_spec}. The glimpse MLP takes input from the
+hidden state of the LSTM and ouputs a vector of normalized weighting over all
+the box CNN feature map spatial grids.
+
+\begin{table}[h!]
+\caption{Box network CNN specification}
+\label{tab:box_cnn_spec}
+\centering
+
+% \resizebox{\columnwidth}{!}{
+\begin{small}
+\begin{tabular}{cccccc}
+Name    & Type  & Input    & Spec (size/stride)          & Size CVPPP/MS-COCO      & Size KITTI             \\
+input   & input & -        & -                           & $224\times224\times9$   & $128\times448\times9$  \\
+conv1-1 & conv  & input    & $3\times3\times9\times16$   & $224\times224\times16$  & $128\times448\times16$ \\
+pool1   & pool  & conv1-2  & max $2\times2$              & $112\times112\times16$  & $64\times224\times16$  \\
+conv1-2 & conv  & conv1-1  & $3\times3\times16\times16$  & $112\times112\times16$  & $64\times224\times16$  \\
+pool1   & pool  & conv1-2  & max $2\times2$              & $56\times56\times16$    & $32\times112\times16$  \\
+conv2-1 & conv  & pool1    & $3\times3\times16\times32$  & $56\times56\times32$    & $32\times112\times32$  \\
+conv2-2 & conv  & conv2-1  & $3\times3\times32\times32$  & $56\times56\times32$    & $32\times112\times32$  \\
+pool2   & pool  & conv2-2  & max $2\times2$              & $28\times28\times32$    & $16\times56\times32$   \\
+conv3-1 & conv  & pool2    & $3\times3\times32\times64$  & $28\times28\times64$    & $16\times56\times64$   \\
+conv3-2 & conv  & conv3-1  & $3\times3\times64\times64$  & $28\times28\times64$    & $16\times56\times64$   \\
+pool3   & pool  & conv3-2  & max $2\times2$              & $14\times14\times64$    & $8\times28\times64$    \\
+conv3-1 & conv  & pool2    & $3\times3\times64\times64$  & $14\times14\times64$    & $8\times28\times64$    \\
+conv3-2 & conv  & conv3-1  & $3\times3\times64\times64$  & $14\times14\times64$    & $8\times28\times64$    \\
+pool3   & pool  & conv3-2  & max $2\times2$              & $7\times7\times64$    & $4\times14\times64$    \\
+\end{tabular}
+\end{small}
+% }
+\end{table}
+
+\begin{table}[h!]
+\caption{Box network LSTM specification}
+\label{tab:box_lstm_spec}
+\centering
+\begin{small}
+\begin{tabular}{cccccc}
+Name        & Size CVPPP/MS-COCO     & Size KITTI  \\
+LSTM        & $256$                  & $256$       \\
+GlimpseMLP1 & $256$                  & $256$       \\
+GlimpseMLP2 & $7\times7$             & $4\times14$ \\
+\end{tabular}
+\end{small}
+\end{table}
+
+\subsection{Segmentation network}
+
+The segmentation networks takes in a patch size $48\times48$ with multiple
+channels. The first three channels are the original image R, G, B channels.
+Then there are 8 channels of orientation angles, and then 1 channel of
+foreground heat map, all predicted by FCN. Full detail is listed in
+Table~\ref{tab:seg_net_spec}.
+
+\begin{table}[h!]
+\caption{Segmentation network specification}
+\label{tab:seg_net_spec}
+\centering
+
+% \resizebox{\columnwidth}{!}{
+\begin{small}
+\begin{tabular}{cccccc}
+Name       & Type   & Input                & Spec (size/stride)             & Size                 \\
+input      & input  & -                    & -                              & $48\times48\times13$ \\
+conv1-1    & conv   & input                & $3\times3\times13\times16$     & $48\times48\times16$ \\
+conv1-2    & conv   & conv1-1              & $3\times3\times16\times32$     & $48\times48\times32$ \\
+pool1      & pool   & conv1-2              & max $2\times2$                 & $24\times24\times32$ \\
+conv2-1    & conv   & pool1                & $3\times3\times32\times32$     & $24\times24\times32$ \\
+conv2-2    & conv   & conv2-1              & $3\times3\times32\times64$     & $24\times24\times64$ \\
+pool3      & pool   & conv2-2              & max $2\times2$                 & $12\times12\times64$ \\
+conv3-1    & conv   & pool2                & $3\times3\times64\times64$     & $12\times12\times64$ \\
+conv3-2    & conv   & conv3-1              & $3\times3\times64\times96$     & $12\times12\times96$ \\
+pool3      & pool   & conv3-2              & max $2\times2$                 & $6\times6\times96$   \\
+deconv4-1  & deconv & pool3                & $3\times3\times64\times96/2$   & $12\times12\times64$ \\
+deconv4-2  & deconv & deconv4-1 + conv3-1  & $3\times3\times64\times128$    & $12\times12\times64$ \\
+deconv5-1  & deconv & deconv4-2 + conv2-2  & $3\times3\times32\times128/2$  & $24\times24\times32$ \\
+deconv5-2  & deconv & deconv5-1 + conv2-1  & $3\times3\times32\times64$     & $24\times24\times32$ \\
+deconv6-1  & deconv & deconv5-2 + conv1-2  & $3\times3\times16\times64/2$   & $48\times48\times16$ \\
+deconv6-2  & deconv & deconv6-1 + conv1-1  & $3\times3\times16\times32$     & $48\times48\times16$ \\
+deconv6-3  & deconv & deconv6-2 + input    & $3\times3\times1\times29$      & $48\times48\times1$  \\
+
+\end{tabular}
+\end{small}
+% }
+\end{table}
