@@ -6,7 +6,7 @@ the importance of instance segmentation in plant phenotyping. We ran the A1
 subset of CVPPP plant leaf segmentation dataset. We trained our model on 128
 labelled images, and report results on the 33 test images. We compare our
 performance to \cite{romeraparedes15ris}, and other top approaches that were
-published with the CVPPP conference; See the collation study
+published with the CVPPP conference; see the collation study
 \cite{scharr16leaf} for details of these  other approaches.
 
 \textbf{KITTI car segmentation}. Instance segmentation also provides rich
@@ -20,7 +20,7 @@ relative importance of model components via ablation studies.
 MS-COCO and test counting performance on the results. We chose ``person'' and
 ``zebra'' because these are the two of the most common classes in VQA
 questions. We report counting performance on images with at least one instance
-of the class: 677 zebra images, and 21634 ``person'' images.
+of the class: 677 zebra images, and 21,634 ``person'' images.
 
 \input{tabs/cvppp_table.tex}
 \input{figs/cvppp_fig.tex}
@@ -30,12 +30,13 @@ of the class: 677 zebra images, and 21634 ``person'' images.
 
 \textbf{Evaluation metrics}. We report the  metrics used by the other studies
 in the respective benchmarks: symmetric best dice (SBD) for leaf segmentation
-(See Equation~\ref{eq:bd}, \ref{eq:sbd}) and mean (weighted) coverage (MWCov,
-MUCov) for car segmentation (See Equation~\ref{eq:mwcov}, \ref{eq:mucov}). Both
-coverage score measures the instance-wise IoU for each ground-truth instance
-averaged over the image. MWCov further weights the score by the size of the
-ground-truth instance segmentation (larger object gets larger weight).
-\vspace{-3pt}
+(see Equations~\ref{eq:bd}, \ref{eq:sbd}) and mean (weighted) coverage (MWCov,
+MUCov) for car segmentation (see Equations~\ref{eq:mwcov}, \ref{eq:mucov}). The
+coverage scores measure the instance-wise IoU for each ground-truth instance
+averaged over the image; MWCov further weights the score by the size of the
+ground-truth instance segmentation (larger objects get larger weights).
+%\vspace{-3pt}
+
 \begin{align}
 \label{eq:bd}
 \text{DICE}(A, B) &= \frac{2 |A \cup B|}{|A| + |B|} \ \ \ \ \ \ \ \
@@ -56,11 +57,11 @@ ground-truth instance segmentation (larger object gets larger weight).
 \max_j \text{IoU}(y_i, y_j^*)
 \end{align}
 
-Counting is measured in absolute difference in count (|DiC|) (See
+Counting is measured in absolute difference in count (|DiC|) (see
 Equation~\ref{eq:dic}), average false positive (AvgFP), and average false
 negative (AvgFN). False positive is the number of predicted instances that do
-not overlap with the ground-truth, and false negative is the number of ground-
-truth instances that do not overlap with the prediction.
+not overlap with the ground-truth, and false negative is the number of 
+ground-truth instances that do not overlap with the prediction.
 \vspace{-3pt}
 \begin{align}
 \label{eq:dic}
@@ -87,7 +88,7 @@ likely helps segment smaller objects, whereas our box network does not reliably
 detect distant cars.
 
 In the zebra counting task, we found that our model outperforms the detector
-and NMS method, and associative-subitizing methods~\cite{chattopadhyay16count};
+and NMS method, and associative-subitizing methods~\cite{chattopadhyay16count},
 but we are not doing as well in the person category. Figure~\ref{fig:count}
 shows the relation between counting performance and number of instances. Mean
 absolute difference in count is around 1 for up to 18 leaves, 7 cars, 4 zebras
@@ -103,11 +104,11 @@ segmentation network can handle a range of object sizes because of the
 design of the box network.
 
 We found that using scheduled sampling results in much better performance. It
-helps by making training approach resemble testing, gradually forcing the model
+helps by making training resemble testing, gradually forcing the model
 to carry out a full sequence during training instead of relying on ground-
 truth input. Finally, the convolutional and attentional architecture
 significantly reduces the number of parameters and the performance is quite
-well even just trained with 100 leaf images and 1000 zebra images.
+strong despite being trained with only 100 leaf images and 1000 zebra images.
 
 \input{figs/coco_person_fig.tex}
 \input{figs/coco_zebra_fig.tex}

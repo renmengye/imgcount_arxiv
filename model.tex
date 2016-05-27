@@ -1,17 +1,18 @@
 \section{Recurrent attention model} 
 
 Our proposed model has four major components: A) a \textbf{2D external memory}
-that tracks the state of the segmented objects, B) a \textbf{box proposal network}
-responsible for localizing objects of interest,  C) a \textbf{segmentation network} 
-for segmenting image pixels within the box, and D) a \textbf{scoring network} 
+that tracks the state of the segmented objects; B) a \textbf{box proposal network}
+responsible for localizing objects of interest;  C) a \textbf{segmentation network} 
+for segmenting image pixels within the box; and D) a \textbf{scoring network} 
 that determines if an object instance has been found, and also decides when to stop.
+See Figure~\ref{fig:model_arch} for an illustration of these components.
 
 \input{figs/model_arch_fig.tex}
 
 \textbf{Notation}. We use the following notation to describe the model
-architecture (See Figure~\ref{fig:model_arch}): $x \in \mathbb{R}^{H \times W}$
+architecture: $x \in \mathbb{R}^{H \times W}$
 is the input image; $y_{t}$, $y^*_{t} \in (0, 1)^{H \times W}$ is the
-segmentation  output /ground-truth sequence; $s_{t}$, $s^*_{t} \in (0, 1)$ is
+segmentation  output/ground-truth sequence; $s_{t}$, $s^*_{t} \in (0, 1)$ is
 the confidence score output/ground-truth sequence; $W(x) = Wx + b$ is a learned
 affine transformation.
 
@@ -31,7 +32,7 @@ angle towards the centroid of the object, and quantize the angle into 8
 different classes, as shown in Figure~\ref{fig:fcn}. The angle map forces the
 model to learn object boundary information, which is missing in the foreground
 segmentation.  The architecture and training of these components are detailed
-in the Supp. Material.  We denote $D_0(x)$ as the pretrained FCN applied to the
+in the Appendix. We denote $D_0(x)$ as the pretrained FCN applied to the
 original image.
 
 \input{figs/fcn_fig.tex}
@@ -54,7 +55,7 @@ d_t^{\text{Canvas}} = \left[c_{t}, D_0(x)\right], \ \ \ \
 c_0^{\text{Canvas}} &= 0, \ \ \ \
 c_t^{\text{Canvas}} = \max(c_{t-1}, y_{t-1}) \ \forall t > 0
 \end{align}
-\vspace{-8pt}
+\vspace{-4pt}
 
 2. \textbf{\textit{Convolutional LSTM}}. One issue of the cumulative canvas is
 that the recurrent connection from the output of the previous time step into
@@ -72,7 +73,7 @@ gradient to flow through the ConvLSTM without introducing instability.
 d_0^{\text{ConvLSTM}} &= D_0(x),\ \ \ \ 
 d_{t}^{\text{ConvLSTM}} = \text{ConvLSTM}(d_{t-1}, y_{t-1}) \ \forall t > 0
 \end{align}
-\vspace{-16pt}
+\vspace{-6pt}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -86,30 +87,28 @@ single glimpse may not give the upper network enough information to decide
 where exactly to draw the box, we allow the glimpse LSTM to look at different
 locations.  $\alpha$ is  initialized to be uniform over all locations, and
 $\tau$ indexes the glimpses.
-\vspace{-3pt}
+\vspace{-1pt}
 \begin{align}
 u_{\text{box},t} = \text{CNN}(d_t), \ \ \ \
 z_{t, \tau} &= \text{LSTM} (
-\sum_{h, w} \alpha^{h, w}_{t, \tau} u^{h,w,l}_{\text{box},t}, z_{t, \tau-1} ), 
-\ \ \ \
+\sum_{h, w} \alpha^{h, w}_{t, \tau} u^{h,w,l}_{\text{box},t}, z_{t, \tau-1} ), \ \ \ \
 \alpha_{t, \tau+1} = \text{MLP}(z_{t, \tau})
 \end{align}
-\vspace{-16pt}
+\vspace{-6pt}
 
 We pass the LSTM's hidden state through a linear layer to obtain predicted
 box coordinates. We parameterize the box by its normalized center
 $g_{X,Y}$, and log size $\log \delta_{X,Y}$. A scaling factor $\gamma$ is
 also predicted by the linear layer, and used when re-projecting the patch
 to the original image size.
-\vspace{-3pt}
+\vspace{-1pt}
 \begin{align}
-(g_{X,Y}, \log \delta_{X,Y}, \log \sigma_{X,Y}, \gamma) &= 
-W(z_{t, \text{end}}), \ \ \ \
+(g_{X,Y}, \log \delta_{X,Y}, \log \sigma_{X,Y}, \gamma) &= W(z_{t, \text{end}}), \ \ \ \
 \mu_X, \mu_Y = \frac{2g_X}{W} - 1, \frac{2g_Y}{H} - 1
 \end{align}
-\vspace{-16pt}
+\vspace{-6pt}
 
-\textbf{Extracting sub-region}. We follow DRAW \cite{gregor15draw} and use a
+\textbf{Extracting a sub-region}. We follow DRAW \cite{gregor15draw} and use a
 Gaussian interpolation kernel to extract a patch from the $\tilde{x}$, a
 concatenation of the original image with $d_t$. We further allow the model to
 output rectangular patches to account for different shapes of the object.
@@ -120,7 +119,7 @@ F_X[a, i], F_Y[b, j] &= \frac{1}{\sqrt{2\pi} \sigma_X} \exp \left(- \frac{(a -
 \mu_Y^j)^2}{2\sigma_Y^2} \right) \\
 p_t &= \text{Extract}(\tilde{x}_t, F_Y, F_X) \equiv F_Y^T \tilde{x}_t F_X
 \end{align}
-\vspace{-16pt}
+%\vspace{-6pt}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -143,7 +142,7 @@ y_t &= \text{sigmoid} \left(
 \gamma \cdot \text{Extract}(\tilde{y}_t, F_Y^T, F_X^T)
 - \beta \right)
 \end{align}
-\vspace{-16pt}
+%\vspace{-6pt}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -156,13 +155,13 @@ and segmentation network to produce a score between 0 and 1.
 \begin{equation}
 s_{t} = \text{sigmoid}(W(z_{t, \text{end}}) + W(u_{\text{segm}}))
 \end{equation}
-\vspace{-12pt}
+%\vspace{-4pt}
 
-\textbf{Termination condition}. We train the entire model with a sequence
-length determined by the maximum number of objects plus one. During inference,
-we cut off iterations once the output score goes below 0.5. The loss function
+\textbf{Termination condition}. We train the entire model with a sequence length
+determined by the maximum number of objects plus one. During inference, we cut
+off iterations once the output score goes below 0.5. The loss function
 (described below) encourages scores to decrease monotonically.
-\vspace{-8pt}
+%\vspace{-4pt}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -173,43 +172,44 @@ the segmentation matching IoU loss $L_y$; the box IoU loss $L_b$;
 and the score cross-entropy loss $L_s$:
 \vspace{-3pt}
 \begin{equation}
-L(y, b, s) = L_y(y, y^*) + L_b(b, b^*) + L_s(s, s^*).
+L(y, b, s) = L_y(y, y^*) + L_b(b, b^*) + L_s(s, s^*)
 \end{equation}
-\vspace{-12pt}
+\vspace{-4pt}
 
-\textbf{Matching IoU loss (mIOU)}. A primary challenge of instance segmentation
-involves matching model and ground-truth instances.  we compute a maximum-
-weighted bipartite graph matching between the output instances and ground-truth
-instances \cite{stewart15lstmdet, romeraparedes15ris}. Matching makes
+\textbf{(a) Matching IoU loss (mIOU)}. A primary challenge of instance segmentation
+involves matching model and ground-truth instances.  we compute a
+maximum-weighted 
+bipartite graph matching between the output instances and ground-truth
+instances \cite{stewart15lstmdet} and \cite{romeraparedes15ris}. Matching makes
 the loss insensitive to the ordering of the ground-truth instances. Unlike
 coverage scores proposed in \cite{silberman14insseg} it directly penalizes both
 false positive and false negative segmentation. The matching weight $M_{i, j}$
 is the IoU score between a pair of segmentation. We use the Hungarian algorithm
 to compute the matching.
-\vspace{-3pt}
+%\vspace{-3pt}
 \begin{align}
 M_{i, j} &= \text{softIOU}(y_i, y^*_j) \equiv \frac{\sum y_i \cdot y^*_j}
 {\sum y_i + y^*_j - y_i \cdot y^*_j} \\
 L_y(y, y^*) &= -\text{mIOU}(y, y^*) \equiv -\frac{1}{N} \sum_{i, j} 
 M_{i, j} \mathbbm{1}[\text{match}(y_i) = y^*_j]
 \end{align}
-\vspace{-12pt}
+%\vspace{-12pt}
 
-\textbf{Soft box IoU loss}. Although the exact IoU can be derived from the 4-d
+\textbf{(b) Soft box IoU loss}. Although the exact IoU can be derived from the 4-d
 box coordinates, its gradient vanishes when two boxes do not overlap, which can
 be problematic for gradient-based  learning. Instead, we propose a soft version
 of the box IoU. We use the same Gaussian filter to re-project a constant patch
-on the original image,  pad the ground-truth boxes and compute the mIOU between
-the predicted box and the matched padded ground- truth bounding box.
+on the original image, pad the ground-truth boxes and compute the mIOU between
+the predicted box and the matched padded ground-truth bounding box.
 \vspace{-3pt}
 \begin{align}
 b_{t} &= \text{sigmoid}(\gamma \cdot \text{Extract}(\mathbf{1}, F_Y^T, F_X^T) -
 \beta)\\
 L_b(b, b^*) &= -\text{mIOU}(b, \text{Pad}(b^*))
 \end{align}
-\vspace{-12pt}
+%\vspace{-12pt}
 
-\textbf{Monotonic score loss}. To facilitate automatic termination , the
+\textbf{(c) Monotonic score loss}. To facilitate automatic termination, the
 network should output more confident objects first. We proposed a loss function
 that encourages monotonically decreasing values in the score output. Iterations
 with target score 1 are compared to the lower bound of preceding scores, and 0
@@ -220,7 +220,7 @@ L_s(s, s^*) &= \sum_t -s^*_t
 \log\left(\max_{t'=t...T-1} \{s_{t'}\}\right) - (1 - s^*_t)
 \log\left(1 - \min_{t'=0...t} \{s_{t'}\}\right)
 \end{align}
-\vspace{-12pt}
+%\vspace{-12pt}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -241,18 +241,6 @@ network. As shown in Figure~\ref{fig:model_arch}, during training there
 is a dynamic switch in the input of the external memory, to utilize either the
 maximally overlapping ground-truth instance segmentation, or the 
 output of the network from the previous time step.
-
-We denote $\theta_t$ as the probability of feeding in ground-truth segmentation
-that has the greatest overlap with the previous prediction. $\theta_t$ follows
-exponential decay as training goes on, and for larger $t$, the decays comes in
-later.
-\vspace{-3pt}
-\begin{align}
-\theta_t &= 
-\min \left(\Gamma_t \exp \left(-\frac{step - S}{S_2} \right), 1 \right) \\
-\Gamma_t &= 1 + \log(1 + Kt)
-\end{align}
-\vspace{-12pt}
 
 \textbf{Post-processing}. We truncate segmentation outside the predicted
 foreground mask, fill holes with the labels from the nearest neighboring
