@@ -242,6 +242,17 @@ is a dynamic switch in the input of the external memory, to utilize either the
 maximally overlapping ground-truth instance segmentation, or the 
 output of the network from the previous time step.
 
+We denote $\theta_t$ as the probability of feeding in ground-truth segmentation
+that has the greatest overlap with the previous prediction. $\theta_t$ follows
+exponential decay as training goes on, and for larger $t$, the decays comes in
+later.
+\vspace{-3pt}
+\begin{align}
+\theta_t &= 
+\min \left(\Gamma_t \exp \left(-\frac{step - S}{S_2} \right), 1 \right) \\
+\Gamma_t &= 1 + \log(1 + Kt)
+\end{align}
+
 \textbf{Post-processing}. We truncate segmentation outside the predicted
 foreground mask, fill holes with the labels from the nearest neighboring
 predicted instance, and remove object segmentation of size smaller than 425
