@@ -106,25 +106,27 @@ to the original image size.
 (\tilde{g}_{X,Y}, \log \tilde{\delta}_{X,Y}, \log \sigma_{X,Y}, \gamma) &= \mathcal{W}(z_{t, \text{end}})
 \end{align}
 \begin{align}
-g_X, g_Y &= (\tilde{g}_X+1)\frac{W}{2}, (\tilde{g}_Y+1)\frac{H}{2}, \ \ \ \ 
+g_X, g_Y &= (\tilde{g}_X+1)\frac{W}{2}, (\tilde{g}_Y+1)\frac{H}{2}, \ \ \ \  
 \delta_X, \delta_Y = \tilde{\delta_X} W, \tilde{\delta_Y} H
 \end{align}
 \vspace{-6pt}
-\begin{align}
-\mu_X^i, \mu_Y^j &= g_X + (\delta_X + 1) \cdot (i - N / 2 + 0.5) / N, \ \ \ \  
-g_Y + (\delta_Y + 1) \cdot (j - N / 2 + 0.5) / N
-\end{align}
 
 \textbf{Extracting a sub-region}. We follow DRAW \cite{gregor15draw} and use a
 Gaussian interpolation kernel to extract a patch from the $\tilde{x}$, a
 concatenation of the original image with $d_t$. We further allow the model to
 output rectangular patches to account for different shapes of the object.
 \begin{align}
+\mu_X^i, \mu_Y^j &= g_X + (\delta_X + 1) \cdot (i - N / 2 + 0.5) / N, \ \  
+g_Y + (\delta_Y + 1) \cdot (j - N / 2 + 0.5) / N
+\end{align}
+\begin{align}
 F_X[a, i], F_Y[b, j] &= 
 \frac{1}{\sqrt{2\pi} \sigma_X} \exp \left(- \frac{(a -
 \mu_X^i)^2}{2\sigma_X^2} \right), 
 \frac{1}{\sqrt{2\pi} \sigma_Y} \exp \left(- \frac{(b -
-\mu_Y^j)^2}{2\sigma_Y^2} \right) \\
+\mu_Y^j)^2}{2\sigma_Y^2} \right)
+\end{align}
+\begin{align}
 p_t &= \text{Extract}(\tilde{x}_t, F_Y, F_X) \equiv F_Y^T \tilde{x}_t F_X
 \end{align}
 %\vspace{-6pt}
@@ -144,7 +146,6 @@ image using the transpose of the previous computed Gaussian filters. The
 learned $\gamma$ to magnifies the signal within the bounding box, and a
 constant $\beta$ to suppresses the pixels outside the box. Lastly, the sigmoid
 function produces final segmentation values between 0 and 1.
-
 \begin{align}
 y_t &= \text{sigmoid} \left(
 \gamma \cdot \text{Extract}(\tilde{y}_t, F_Y^T, F_X^T)
