@@ -13,7 +13,7 @@ See Figure~\ref{fig:model_arch} for an illustration of these components.
 architecture: $x \in \mathbb{R}^{H \times W}$
 is the input image; $y_{t}$, $y^*_{t} \in (0, 1)^{H \times W}$ is the
 segmentation  output/ground-truth sequence; $s_{t}$, $s^*_{t} \in (0, 1)$ is
-the confidence score output/ground-truth sequence; $W(x) = Wx + b$ is a learned
+the confidence score output/ground-truth sequence; $\mathcal{W}(z) = w^T z + b$ is a learned
 affine transformation.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -103,18 +103,26 @@ also predicted by the linear layer, and used when re-projecting the patch
 to the original image size.
 \vspace{-1pt}
 \begin{align}
-(g_{X,Y}, \log \delta_{X,Y}, \log \sigma_{X,Y}, \gamma) &= W(z_{t, \text{end}}), \ \ \ \
-\mu_X, \mu_Y = \frac{2g_X}{W} - 1, \frac{2g_Y}{H} - 1
+(\tilde{g}_{X,Y}, \log \tilde{\delta}_{X,Y}, \log \sigma_{X,Y}, \gamma) &= \mathcal{W}(z_{t, \text{end}})
+\end{align}
+\begin{align}
+g_X, g_Y &= (\tilde{g}_X+1)\frac{W}{2}, (\tilde{g}_Y+1)\frac{H}{2}, \ \ \ \ 
+\delta_X, \delta_Y = \tilde{\delta_X} W, \tilde{\delta_Y} H
 \end{align}
 \vspace{-6pt}
+\begin{align}
+\mu_X^i, \mu_Y^j &= g_X + (\delta_X + 1) \cdot (i - N / 2 + 0.5) / N, \ \ \ \  
+g_Y + (\delta_Y + 1) \cdot (j - N / 2 + 0.5) / N
+\end{align}
 
 \textbf{Extracting a sub-region}. We follow DRAW \cite{gregor15draw} and use a
 Gaussian interpolation kernel to extract a patch from the $\tilde{x}$, a
 concatenation of the original image with $d_t$. We further allow the model to
 output rectangular patches to account for different shapes of the object.
 \begin{align}
-F_X[a, i], F_Y[b, j] &= \frac{1}{\sqrt{2\pi} \sigma_X} \exp \left(- \frac{(a -
-\mu_X^i)^2}{2\sigma_X^2} \right),
+F_X[a, i], F_Y[b, j] &= 
+\frac{1}{\sqrt{2\pi} \sigma_X} \exp \left(- \frac{(a -
+\mu_X^i)^2}{2\sigma_X^2} \right), 
 \frac{1}{\sqrt{2\pi} \sigma_Y} \exp \left(- \frac{(b -
 \mu_Y^j)^2}{2\sigma_Y^2} \right) \\
 p_t &= \text{Extract}(\tilde{x}_t, F_Y, F_X) \equiv F_Y^T \tilde{x}_t F_X
@@ -153,7 +161,7 @@ process, we incorporate a scoring network, similar to the one presented in
 \cite{romeraparedes15ris}. Our scoring network takes information from the box
 and segmentation network to produce a score between 0 and 1.
 \begin{equation}
-s_{t} = \text{sigmoid}(W(z_{t, \text{end}}) + W(u_{\text{segm}}))
+s_{t} = \text{sigmoid}(\mathcal{W}(z_{t, \text{end}}) + \mathcal{W}(u_{\text{segm}}))
 \end{equation}
 %\vspace{-4pt}
 
