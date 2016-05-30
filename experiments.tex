@@ -89,12 +89,12 @@ detect distant cars.
 
 In the zebra counting task, we found that our model outperforms the detector
 and NMS method, and associative-subitizing methods~\cite{chattopadhyay16count},
-but we are not doing as well in the person category. Figure~\ref{fig:count}
+but we are not doing as well in the person category. However, relative to these
+regression-based methods,  our model permits insight into the recognition of
+each instance by inspecting the output segmentation. Figure~\ref{fig:count}
 shows the relation between counting performance and number of instances. Mean
 absolute difference in count is around 1 for up to 18 leaves, 7 cars, 4 zebras
-and 3 people. However, relative to these regression-based methods,  our model
-permits insight into the recognition of each instance by inspecting the output
-segmentation.
+and 3 people.
 
 From the figures above we see our model is handling a significant amount of
 object occlusion and truncation. We verified that the external memory helps
@@ -105,7 +105,8 @@ design of the box network.
 
 We found that using scheduled sampling results in much better performance. It
 helps by making training resemble testing, gradually forcing the model
-to carry out a full sequence during training instead of relying on ground-truth input. Finally, the convolutional and attentional architecture
+to carry out a full sequence during training instead of relying on ground-truth
+input. Finally, the convolutional and attentional architecture
 significantly reduces the number of parameters and the performance is quite
 strong despite being trained with only 100 leaf images and 1000 zebra images.
 

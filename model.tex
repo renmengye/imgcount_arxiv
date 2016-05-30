@@ -10,10 +10,11 @@ See Figure~\ref{fig:model_arch} for an illustration of these components.
 \input{figs/model_arch_fig.tex}
 
 \textbf{Notation}. We use the following notation to describe the model
-architecture: $x \in \mathbb{R}^{H \times W}$
-is the input image; $y_{t}$, $y^*_{t} \in (0, 1)^{H \times W}$ is the
-segmentation  output/ground-truth sequence; $s_{t}$, $s^*_{t} \in (0, 1)$ is
-the confidence score output/ground-truth sequence; $\mathcal{W}(z) = w^T z + b$ is a learned
+architecture: $x \in \mathbb{R}^{H \times W}$ is the input image; $t$ indexes
+the iterations of the model, and $\tau$ indexes the glimpses of the inner RNN;
+$y_{t}$, $y^*_{t} \in (0, 1)^{H \times W}$ is the segmentation 
+output/ground-truth sequence; $s_{t}$, $s^*_{t} \in (0, 1)$ is the confidence 
+score output/ground-truth sequence; $\mathcal{W}(z) = w^T z + b$ is a learned 
 affine transformation.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -103,7 +104,8 @@ also predicted by the linear layer, and used when re-projecting the patch
 to the original image size.
 \vspace{-1pt}
 \begin{align}
-(\tilde{g}_{X,Y}, \log \tilde{\delta}_{X,Y}, \log \sigma_{X,Y}, \gamma) &= \mathcal{W}(z_{t, \text{end}})
+(\tilde{g}_{X,Y}, \log \tilde{\delta}_{X,Y}, \log \sigma_{X,Y}, \gamma) &= 
+\mathcal{W}(z_{t, \text{end}})
 \end{align}
 \begin{align}
 g_X, g_Y &= (\tilde{g}_X+1)\frac{W}{2}, (\tilde{g}_Y+1)\frac{H}{2}, \ \ \ \  
@@ -112,9 +114,10 @@ g_X, g_Y &= (\tilde{g}_X+1)\frac{W}{2}, (\tilde{g}_Y+1)\frac{H}{2}, \ \ \ \
 \vspace{-6pt}
 
 \textbf{Extracting a sub-region}. We follow DRAW \cite{gregor15draw} and use a
-Gaussian interpolation kernel to extract a patch from the $\tilde{x}$, a
-concatenation of the original image with $d_t$. We further allow the model to
-output rectangular patches to account for different shapes of the object.
+Gaussian interpolation kernel to extract an $N \times N$ patch from the
+$\tilde{x}$, a concatenation of the original image with $d_t$. We further allow
+the model to output rectangular patches to account for different shapes of the
+object.
 \begin{align}
 \mu_X^i, \mu_Y^j &= g_X + (\delta_X + 1) \cdot (i - N / 2 + 0.5) / N, \ \  
 g_Y + (\delta_Y + 1) \cdot (j - N / 2 + 0.5) / N
@@ -250,17 +253,6 @@ network. As shown in Figure~\ref{fig:model_arch}, during training there
 is a dynamic switch in the input of the external memory, to utilize either the
 maximally overlapping ground-truth instance segmentation, or the 
 output of the network from the previous time step.
-
-We denote $\theta_t$ as the probability of feeding in ground-truth segmentation
-that has the greatest overlap with the previous prediction. $\theta_t$ follows
-exponential decay as training goes on, and for larger $t$, the decays comes in
-later.
-\vspace{-3pt}
-\begin{align}
-\theta_t &= 
-\min \left(\Gamma_t \exp \left(-\frac{step - S}{S_2} \right), 1 \right) \\
-\Gamma_t &= 1 + \log(1 + Kt)
-\end{align}
 
 \textbf{Post-processing}. We truncate segmentation outside the predicted
 foreground mask, fill holes with the labels from the nearest neighboring

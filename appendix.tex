@@ -1,54 +1,23 @@
 \appendix
 
-% \section{Additional model output}
-
-% We show additional model output in Figure~\ref{fig:kitti_out2},
-% \ref{fig:cvppp_out2}
-
-% \newcommand{\kittiImg}[1] {
-% \includegraphics[width=0.3\textwidth]{./figs/kitti_img/#1.png} &
-% \includegraphics[width=0.3\textwidth]{./figs/kitti_gt/#1.png} &
-% \includegraphics[width=0.3\textwidth]{./figs/kitti_out/#1.png}}
-
-% \begin{figure}
-% \centering
-% \begin{small}
-% \resizebox{\columnwidth}{!}{
-% \begin{tabular}{ccc}
-% Image & GT & Ours \\
-% \kittiImg{005057} \\
-% \kittiImg{004369} \\
-% \end{tabular}
-% }
-% \caption{Examples of our instance segmentation output on KITTI}
-% \label{fig:kitti_out2}
-% \end{small}
-% \end{figure}
-
-% \newcommand{\cvpppImg}[1] {
-% \includegraphics[width=0.133\textwidth]{./figs/cvppp_img/plant#1_rgb.png} &
-% \includegraphics[width=0.133\textwidth]{./figs/cvppp_gt/plant#1_label.png} &
-% \includegraphics[width=0.133\textwidth]{./figs/cvppp_out/plant#1_label.png}}
-
-% \begin{figure}
-% \centering
-% \begin{small}
-% \resizebox{\columnwidth}{!}{
-% \begin{tabular}{ccc|ccc}
-% Image & GT & Ours & Image & GT & Ours \\
-% \cvpppImg{042} & \cvpppImg{119}\\
-% \end{tabular}
-% }
-% \caption{Examples of our instance segmentation output on CVPPP.}
-% \label{fig:cvppp_out2}
-% \end{small}
-% \end{figure}
-
 \section{Training procedure specification} 
 
-We used the Adam optimizer with learning rate 0.001. 
-The learning rate is multiplied by
-0.85 for every 5000 steps of training.
+We used the Adam optimizer with learning rate 0.001 and batch size of 8.  The
+learning rate is multiplied by 0.85 for every 5000 steps of training.
+
+\subsection{Scheduled sampling}
+We denote $\theta_t$ as the probability of feeding in ground-truth segmentation
+that has the greatest overlap with the previous prediction, as opposed to model
+output. $\theta_t$ follows exponential decay as training goes on, and for
+larger $t$, the decay occurs later:
+\vspace{-3pt}
+\begin{align}
+\theta_t &= 
+\min \left(\Gamma_t \exp \left(-\frac{epoch - S}{S_2} \right), 1 \right) \\
+\Gamma_t &= 1 + \log(1 + Kt)
+\end{align}
+where $epoch$ is the training index, $S$, $S_2$, and $K$ are constants. In the
+experiments reported here, their values are $10000$, $2885$, and $3$.
 
 \section{Model architecture}
 
@@ -154,7 +123,7 @@ conv3-2 & conv  & conv3-1  & $3\times3\times64\times64$  & $28\times28\times64$ 
 pool3   & pool  & conv3-2  & max $2\times2$              & $14\times14\times64$    & $8\times28\times64$    \\
 conv3-1 & conv  & pool2    & $3\times3\times64\times64$  & $14\times14\times64$    & $8\times28\times64$    \\
 conv3-2 & conv  & conv3-1  & $3\times3\times64\times64$  & $14\times14\times64$    & $8\times28\times64$    \\
-pool3   & pool  & conv3-2  & max $2\times2$              & $7\times7\times64$    & $4\times14\times64$    \\
+pool3   & pool  & conv3-2  & max $2\times2$              & $7\times7\times64$      & $4\times14\times64$    \\
 \end{tabular}
 \end{small}
 % }
