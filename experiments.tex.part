@@ -22,11 +22,11 @@ MS-COCO and test counting performance on the results. We chose ``person'' and
 questions. We report counting performance on images with at least one instance
 of the class: 677 zebra images, and 21,634 ``person'' images.
 
-\input{tabs/cvppp_table.tex}
-\input{figs/cvppp_fig.tex}
-\input{tabs/kitti_table.tex}
-\input{figs/kitti_fig.tex}
-\input{count_fig.tex}
+\input{tabs/cvppp_table.tex.part}
+\input{figs/cvppp_fig.tex.part}
+\input{tabs/kitti_table.tex.part}
+\input{figs/kitti_fig.tex.part}
+\input{count_fig.tex.part}
 
 \textbf{Evaluation metrics}. We report the  metrics used by the other studies
 in the respective benchmarks: symmetric best dice (SBD) for leaf segmentation
@@ -110,5 +110,5 @@ input. Finally, the convolutional and attentional architecture
 significantly reduces the number of parameters and the performance is quite
 strong despite being trained with only 100 leaf images and 1000 zebra images.
 
-\input{figs/coco_person_fig.tex}
-\input{figs/coco_zebra_fig.tex}
+\input{figs/coco_person_fig.tex.part}
+\input{figs/coco_zebra_fig.tex.part}

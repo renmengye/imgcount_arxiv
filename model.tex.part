@@ -7,7 +7,7 @@ for segmenting image pixels within the box; and D) a \textbf{scoring network}
 that determines if an object instance has been found, and also decides when to stop.
 See Figure~\ref{fig:model_arch} for an illustration of these components.
 
-\input{figs/model_arch_fig.tex}
+\input{figs/model_arch_fig.tex.part}
 
 \textbf{Notation}. We use the following notation to describe the model
 architecture: $x \in \mathbb{R}^{H \times W}$ is the input image; $t$ indexes
@@ -36,7 +36,7 @@ segmentation.  The architecture and training of these components are detailed
 in the Appendix. We denote $D_0(x)$ as the pretrained FCN applied to the
 original image.
 
-\input{figs/fcn_fig.tex}
+\input{figs/fcn_fig.tex.part}
 
 To facilitate learning to sequentially enumerate the objects, we incorporate an
 external 2D memory in the RNN structure. We treat this 2D memory as the third
