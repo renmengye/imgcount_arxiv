@@ -93,7 +93,7 @@ but we are not doing as well in the person category. However, relative to these
 regression-based methods,  our model permits insight into the recognition of
 each instance by inspecting the output segmentation. Figure~\ref{fig:count}
 shows the relation between counting performance and number of instances. Mean
-absolute difference in count is around 1 for up to 18 leaves, 7 cars, 4 zebras
+absolute difference in count is around 1 for up to 18 leaves, 7 cars, 7 zebras
 and 3 people.
 
 From the figures above we see our model is handling a significant amount of
@@ -104,11 +104,11 @@ segmentation network can handle a range of object sizes because of the
 design of the box network.
 
 We found that using scheduled sampling results in much better performance. It
-helps by making training resemble testing, gradually forcing the model
-to carry out a full sequence during training instead of relying on ground-truth
-input. Finally, the convolutional and attentional architecture
-significantly reduces the number of parameters and the performance is quite
-strong despite being trained with only 100 leaf images and 1000 zebra images.
+helps by making training resemble testing, gradually forcing the model to carry
+out a full sequence during training instead of relying on ground-truth input.
+Finally, the convolutional and attentional architecture significantly reduces
+the number of parameters (around 9M) and the performance is quite strong
+despite being trained with only 100 leaf images and 1000 zebra images.
 
 \input{figs/coco_person_fig.tex.part}
 \input{figs/coco_zebra_fig.tex.part}

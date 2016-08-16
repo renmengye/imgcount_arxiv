@@ -2,8 +2,9 @@
 
 \section{Training procedure specification} 
 
-We used the Adam optimizer with learning rate 0.001 and batch size of 8.  The
-learning rate is multiplied by 0.85 for every 5000 steps of training.
+We used the Adam optimizer \cite{kingma14adam} with learning rate 0.001 and
+batch size of 8. The learning rate is multiplied by 0.85 for every 5000 steps
+of training.
 
 \subsection{Scheduled sampling}
 We denote $\theta_t$ as the probability of feeding in ground-truth segmentation

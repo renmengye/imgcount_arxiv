@@ -4,7 +4,7 @@ Instance segmentation has recently received a burst of research attention, as
 it provides higher level of precision of image understanding compared to object
 detection and semantic segmentation.
 
-\textbf{Instance segmentation using graphical models}. An early exploration of
+\textbf{Instance segmentation using graphical models}.An early exploration of
 instance segmentation proposes a multi-stage pipeline composed of patch-wise
 features based on deep learning, combined into a segmentation tree
 \cite{silberman14insseg}. They formulated a new loss function, the coverage
@@ -18,7 +18,12 @@ strong results on the challenging KITTI object dataset; however, the graphical
 model formulation entails long running times, and their energy functions are
 dependent on instances being connected and having a clear depth ordering.
 
-\textbf{Instance segmentation using CNN}. Liang et al.~\cite{liang15pfinsseg}
+\textbf{Instance segmentation using CNN}. 
+\b{ Pinheiro et al.~\cite{pinheiro15seg} trained a CNN to generate object
+segmentation proposals, which ran densely on all windows at multiple scales. 
+The output of their proposed system requires further processing to get final 
+instance-level segmentations.}
+Liang et al.~\cite{liang15pfinsseg}
 used a CNN to generate pixel-level object size information, and used clustering
 as a post-processing step. They added a regressor at the top of the CNN to
 estimate the count, which is the total number of clusters. An erroneous count
@@ -50,11 +55,14 @@ attention mechanism \cite{xu15caption}. Romera-Paredes and Torr
 \cite{romeraparedes15ris} use convolutional LSTM (ConvLSTM)
 \cite{shi2015convlstm} to produce instance segmentation directly. However,
 since their ConvLSTM is required to handle object detection, inhibition, and
-segmentation all at the same time on a global scale, the final output loses
-precision. They add a dense CRF to restore the resolution. Compared to their
-approach, our segmentation network operates on a local level. Instead of
-resorting to graphical models, we added skip connections to restore the
-resolution.
+segmentation all 
+%at the same time 
+\b{convolutionally} on a global scale, the final output loses
+precision. They add a dense CRF to restore the resolution.
+\b{ Contrast to their approach, our segmentation network has a box network that
+confines the instance-wise pixel segmentation within a local window.}
+Instead of resorting to graphical models, we added skip connections to restore
+the resolution.
 
 \textbf{Instance counting}. Previous work on object counting in images has
 mainly focused on crowds of pedestrians and biological cells

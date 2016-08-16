@@ -31,8 +31,10 @@ version of object detection. One motivation of this work is to introduce a way
 of performing dynamic NMS to reason about occlusion.
 
 In addition to object occlusion, another challenge is the dimensionality of the
-structured output, which is bounded by the number of pixels times the maximum
-number of objects. Standard fully convolutional networks (FCN) \cite{long15fcn}
+structured output, 
+\b{which can be on the order of the number of pixels times
+the number of objects.}
+Standard fully convolutional networks (FCN) \cite{long15fcn}
 will have trouble directly outputting all instance labels in a single shot.
 Recent work on instance segmentation \cite{silberman14insseg,
 zhang15insseg,zhang16insseg}  formulates complex graphical models, which
@@ -50,11 +52,13 @@ counting processes. For real-world cluttered scenes, iterative counting with
 attention will likely perform better than a regression model that operates on
 the global image level.
 
-In this work, we focus on instance segmentation of a single object-type per
-image. We evaluate our model on a number of challenging datasets: 1) CVPPP leaf
-segmentation dataset \cite{minervini14cvppp}; 2) KITTI car segmentation dataset
+\b{\*{Contributions}. We proposed a novel model with recurrent attention
+dynamics in which we explicitly feed in the output from one time-step to
+facilitate occlusion reasoning in the next.  We focus on instance segmentation
+of a single object-type per image and evaluate our model on a number of
+challenging datasets for instance segmentation: 1) CVPPP leaf segmentation
+dataset \cite{minervini14cvppp}; 2) KITTI car segmentation dataset
 \cite{geiger12kitti}; and 3) on MS-COCO \cite{lin14mscoco} images, where we
-train two different models, for ``person'' and ``zebra'' categories, and test
-the model with images that contain at least one instance of the chosen
-category. We show state-of-the-art performance on both CVPPP and KITTI dataset,
-and impressive counting ability on MS-COCO.
+train two different models, on ``person'' and ``zebra'' categories.  We show
+state-of-the-art performance on both CVPPP and KITTI dataset, and impressive
+counting ability on MS-COCO. }
