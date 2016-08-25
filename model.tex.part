@@ -11,23 +11,25 @@ illustration of these components.
 \input{figs/model_arch_fig.tex.part}
 
 \textbf{Notation}. We use the following notation to describe the model
-architecture: $\*{x} \in \mathbb{R}^{H \times W \times C}$ is the input image
-($H$, $W$ denotes the dimension, and $C$ denotes the colour channel); $t$
-indexes the iterations of the model, and $\tau$ indexes the glimpses of the
-inner RNN;
-$\{\*{y}_t | \*{y}_t \in (0, 1)^{H \times W}\}_{t=1}^T$,
-$\{\*{y}^*_t | \*{y}^*_t \in \{0, 1\}^{H \times W}\}_{t=1}^T$
+architecture:
+$\*{x} \in \mathbb{R}^{H \times W \times C}$
+is the input image
+($H$, $W$ denotes the dimension, and $C$ denotes the colour channel);
+$t$ indexes the iterations of the model, and 
+$\tau$ indexes the glimpses of the inner RNN;
+$\*y   = \{\*{y}_t | \*{y}_t \in (0, 1)^{H \times W}\}_{t=1}^T$,
+$\*y^* = \{\*{y}^*_t | \*{y}^*_t \in \{0, 1\}^{H \times W}\}_{t=1}^T$
 is the output/ground-truth segmentation sequence;
-$\{s_{t} | s_t \in (0, 1)\}_{t=1}^{T}$, 
-$\{s^*_{t} | s^*_{t} \in \{0, 1\}\}_{t=1}^{T}$ 
-is the confidence score output/ground-truth sequence.
+$\*s   = \{s_{t} | s_t \in (0, 1)\}_{t=1}^{T}$, 
+$\*s^* = \{s^*_{t} | s^*_{t} \in \{0, 1\}\}_{t=1}^{T}$ 
+is the output/ground-truth confidence score sequence.
 $h = \texttt{CNN}(I)$
 denotes passing an image $I$ through a CNN and returning the hidden activation
 $h$. 
 $I' = \texttt{D-CNN}(h)$
 denotes passing an activation map $h$ through a de-convolutional network
 (D-CNN) and returning an image $I'$.
-$h_t = \texttt{LSTM}(h, x)$ or $\texttt{ConvLSTM}(h_{t-1}, x_t)$
+$h_t = \texttt{LSTM}(h_{t-1}, x_t)$ or $\texttt{ConvLSTM}(h_{t-1}, x_t)$
 denotes unrolling the long short-term memory (LSTM) or convolutional LSTM
 (ConvLSTM) by one time-step with the previous hidden state $h_{t-1}$ and
 current input $x_t$, and returning the current hidden state $h_t$.
@@ -69,10 +71,10 @@ of the canvas keeps adding new pixels from the output of the previous time
 step.
 \begin{align}
 &\*{c}_t                 = \begin{cases}
-                                \*{0},              & \text{if } t = 0     \\
+                                \*{0},              & \text{if } t = 0       \\
                                 \max(\*{c}_{t-1}, 
                                 \*{y}_{t-1}),       & \text{otherwise}
-                           \end{cases}                                     \\
+                           \end{cases}                                       \\
 &\*{d}_t^{\text{canvas}} = \left[\*{c}_{t}, \*{x}\right]
 \end{align}
 
@@ -90,7 +92,7 @@ right). This allows the gradient to flow through the ConvLSTM without
 introducing instability.
 \begin{align}
 \*{d}_t^{\text{clstm}} = \begin{cases}
-                            [\*{x}, \*{0}, ..., \*{0}],   & \text{if } t = 0\\
+                            [\*{x}, \*{0}, ..., \*{0}],   & \text{if } t = 0 \\
                             \texttt{ConvLSTM}(
                             \*{d}_{t-1}, \*{y}_{t-1}),    & \text{otherwise}
                          \end{cases}
@@ -112,12 +114,12 @@ box, we allow the glimpse LSTM to look at different locations by feeding a
 dimension $L$ vector each time. $\alpha$ is  initialized to be uniform over all
 locations, and $\tau$ indexes the glimpses.
 \begin{align}
-\*{u}_{t}        &= \texttt{CNN}(\*{d}_t)                                  \\
-\*{z}_{t, \tau}  &= \texttt{LSTM}(z_{t, \tau-1},
-                    \sum_{h, w} \alpha^{h, w}_{t, \tau} \*{u}^{h,w,l}_{t}) \\
+\*u_t            &= \texttt{CNN}(\*d_t)                                      \\
+\*z_{t, \tau}    &= \texttt{LSTM}(\*z_{t, \tau-1},
+                    \sum_{h, w} \alpha^{h, w}_{t, \tau} u^{h,w,l}_{t})       \\
 \alpha_{t, \tau} &= \begin{cases}
-                    1/(H' \times W'),          & \text{if } \tau = 0       \\
-                    \texttt{MLP}(z_{t, \tau}), & \text{otherwise}
+                    1/(H' \times W'),            & \text{if } \tau = 0       \\
+                    \texttt{MLP}(\*z_{t, \tau}), & \text{otherwise}
                     \end{cases}
 \end{align}
 
@@ -127,15 +129,18 @@ $g_{X,Y}$, and log size $\log \delta_{X,Y}$. A scaling factor $\gamma$ is
 also predicted by the linear layer, and used when re-projecting the patch
 to the original image size.
 \begin{align}
-[\tilde{g}_X, \tilde{g}_Y 
-\log \tilde{\delta}_X, \log \tilde{\delta}_Y, 
-\log \sigma_X, \log \sigma_Y, \gamma] &= 
-\*{w}_b^\top \*{z}_{t, \text{end}} + \*{b}_b
+[\tilde{g}_X,
+ \tilde{g}_Y 
+ \log \tilde{\delta}_X,
+ \log \tilde{\delta}_Y, 
+ \log \sigma_X,
+ \log \sigma_Y,
+ \gamma]                  &=  \*{w}_b^\top \*{z}_{t, \text{end}} + \*{b}_b
 \end{align}
 \begin{align}
-g_X &= (\tilde{g}_X+1)W/2             \\
-g_Y &= (\tilde{g}_Y+1)H/2             \\
-\delta_X &= \tilde{\delta}_X W        \\
+g_X      &= (\tilde{g}_X+1)W/2                                               \\
+g_Y      &= (\tilde{g}_Y+1)H/2                                               \\
+\delta_X &= \tilde{\delta}_X W                                               \\
 \delta_Y &= \tilde{\delta}_Y H
 \end{align}
 
@@ -145,17 +150,17 @@ $\tilde{x}$, a concatenation of the original image with $d_t$. We further allow
 the model to output rectangular patches to account for different shapes of the
 object.
 \begin{align}
-\mu_X^i   &= g_X + (\delta_X + 1) \cdot (i - N / 2 + 0.5) / N            \\
-\mu_Y^j   &= g_Y + (\delta_Y + 1) \cdot (j - N / 2 + 0.5) / N            \\
-F_X[a, i] &= \frac{1}{\sqrt{2\pi} \sigma_X}
-             \exp \left(- \frac{(a - \mu_X^i)^2}{2\sigma_X^2} \right)    \\
-F_Y[b, j] &= \frac{1}{\sqrt{2\pi} \sigma_Y}
-             \exp \left(- \frac{(b - \mu_Y^j)^2}{2\sigma_Y^2} \right)
+\mu_X^i         &= g_X + (\delta_X + 1) \cdot (i - N / 2 + 0.5) / N          \\
+\mu_Y^j         &= g_Y + (\delta_Y + 1) \cdot (j - N / 2 + 0.5) / N          \\
+F_X^{a, i}      &= \frac{1}{\sqrt{2\pi} \sigma_X}                             
+                   \exp \left(- \frac{(a - \mu_X^i)^2}{2\sigma_X^2} \right)  \\
+F_Y^{b, j}      &= \frac{1}{\sqrt{2\pi} \sigma_Y}
+                   \exp \left(- \frac{(b - \mu_Y^j)^2}{2\sigma_Y^2} \right)
 \end{align}
 \begin{align}
-\tilde{\*x}     &= [\*{x}_0, \*{d}_t^{\text{canvas}}]                    \\
+\tilde{\*x}     &= [\*{x}_0, \*{d}_t^{\text{canvas}}]                        \\
 \*p_t           &= \texttt{Extract}(\tilde{\*{x}}_t, F_Y, F_X) 
-                \equiv F_Y^T \tilde{\*{x}}_t F_X
+            \equiv F_Y^T \tilde{\*{x}}_t F_X
 \end{align}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -174,8 +179,8 @@ learned $\gamma$ to magnifies the signal within the bounding box, and a
 constant $\beta$ to suppresses the pixels outside the box. Lastly, the sigmoid
 function produces final segmentation values between 0 and 1.
 \begin{align}
-\*v_t         &= \texttt{CNN}(\*p_t)                                \\
-\tilde{\*y}_t &= \texttt{D-CNN}(\*v_t)                              \\
+\*v_t         &= \texttt{CNN}(\*p_t)                                         \\
+\tilde{\*y}_t &= \texttt{D-CNN}(\*v_t)                                       \\
 \*y_t         &= \texttt{sigmoid} \left(\gamma \cdot 
                  \texttt{Extract}(\tilde{\*y}_t, F_Y^T, F_X^T)
                  -\beta \right)
@@ -209,9 +214,9 @@ off iterations once the output score goes below 0.5. The loss function
 segmentation matching IoU loss $\mathcal{L}_y$; the box IoU loss
 $\mathcal{L}_b$; and the score cross-entropy loss $\mathcal{L}_s$:
 \begin{equation}
-\mathcal{L}(y, b, s) = \mathcal{L}_y(y, y^*) + 
-                       \mathcal{L}_b(b, b^*) + 
-                       \mathcal{L}_s(s, s^*)
+\mathcal{L}(\*y, \*b, \*s) = \mathcal{L}_y(\*y, \*y^*) + 
+                             \mathcal{L}_b(\*b, \*b^*) + 
+                             \mathcal{L}_s(\*s, \*s^*)
 \end{equation}
 
 \textbf{(a) Matching IoU loss (mIOU)}. A primary challenge of instance
@@ -225,13 +230,13 @@ matching weight $\mathcal{M}_{i, j}$ is the IoU score between a pair of
 segmentation. We use the Hungarian algorithm to compute the matching, and it
 does not back-prop gradient in the network.
 \begin{align}
-\mathcal{M}_{i, j}    &= \texttt{softIOU}(y_i, y^*_j) 
-                  \equiv \frac{\sum y_i \cdot y^*_j}
-                         {\sum y_i + y^*_j - y_i \cdot y^*_j}    \\
-\mathcal{L}_y(y, y^*) &= -\texttt{mIOU}(y, y^*)
-                  \equiv -\frac{1}{N} \sum_{i, j} 
-                         \mathcal{M}_{i, j}
-                         \mathbbm{1}[\text{match}(y_i) = y^*_j]
+\mathcal{M}_{i, j}        &= \texttt{softIOU}(\*y_i, \*y^*_j) 
+                      \equiv \frac{\sum \*y_i \cdot \*y^*_j}
+                             {\sum \*y_i + \*y^*_j - \*y_i \cdot \*y^*_j}    \\
+\mathcal{L}_y(\*y, \*y^*) &= -\texttt{mIOU}(\*y, \*y^*)
+                      \equiv -\frac{1}{N} \sum_{i, j} 
+                             \mathcal{M}_{i, j}
+                             \mathbbm{1}[\text{match}(\*y_i) = \*y^*_j]
 \end{align}
 
 \textbf{(b) Soft box IoU loss}. Although the exact IoU can be derived from the
@@ -242,9 +247,10 @@ constant patch on the original image, pad the ground-truth boxes and compute
 the mIOU between the predicted box and the matched padded ground-truth bounding
 box that is  scaled proportionally in both height and width.
 \begin{align}
-b_{t}                 &= \texttt{sigmoid}(\gamma \cdot
-                         \texttt{Extract}(\mathbf{1}, F_Y^T, F_X^T) - \beta) \\
-\mathcal{L}_b(b, b^*) &= -\texttt{mIOU}(b, \texttt{Pad}(b^*))
+\*b_{t}                   &= \texttt{sigmoid}(\gamma \cdot
+                             \texttt{Extract}(
+                             \mathbf{1}, F_Y^T, F_X^T) - \beta)              \\
+\mathcal{L}_b(\*b, \*b^*) &= -\texttt{mIOU}(\*b, \texttt{Pad}(\*b^*))
 \end{align}
 
 \textbf{(c) Monotonic score loss}. To facilitate automatic termination, the
@@ -253,11 +259,11 @@ that encourages monotonically decreasing values in the score output. Iterations
 with target score 1 are compared to the lower bound of subsequent scores, and 0
 targets to the upper bound of preceding scores.
 \begin{align}
-\mathcal{L}_s(s, s^*) &= \frac{1}{T}\sum_t
-                         -s^*_t 
-                         \log\left(\min_{t' \ge t} \{s_{t'}\}\right)
-                         -(1 - s^*_t)
-                         \log\left(1 - \max_{t' \le t} \{s_{t'}\}\right)
+\mathcal{L}_s(\*s, \*s^*) &= \frac{1}{T}\sum_t
+                             -s^*_t 
+                             \log\left(\min_{t' \ge t} \{s_{t'}\}\right)
+                             -(1 - s^*_t)
+                             \log\left(1 - \max_{t' \le t} \{s_{t'}\}\right)
 \end{align}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
