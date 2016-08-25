@@ -5,11 +5,11 @@ assign pixel-level instance labelling to a given image.  While the standard
 semantic segmentation problem entails assigning class labels to each pixel in
 an image, it says nothing about the number of instances of each class in the
 image. Unlike semantic segmentation, instance segmentation is particularly
-difficult in terms of distinguising nearby and occluded objects. Segmenting
-at the instance level is useful for many tasks, such as highlighting the
-outline of objects for improved recognition and allowing robots to delineate
-and grasp individual objects. Obtaining instance level pixel labels is also
-significant with respect to general machine understanding of images.
+difficult in terms of distinguising nearby and occluded objects. Segmenting at
+the instance level is useful for many tasks, such as highlighting the outline
+of objects for improved recognition and allowing robots to delineate and grasp
+individual objects. Obtaining instance level pixel labels is also significant
+with respect to general machine understanding of images.
 
 Counting the objects in an image is also of practical value, and is another
 problem of interest of this work. Traditionally, counting is performed in a
@@ -31,10 +31,8 @@ version of object detection. One motivation of this work is to introduce a way
 of performing dynamic NMS to reason about occlusion.
 
 In addition to object occlusion, another challenge is the dimensionality of the
-structured output, 
-\b{which can be on the order of the number of pixels times
-the number of objects.}
-Standard fully convolutional networks (FCN) \cite{long15fcn}
+structured output, which can be on the order of the number of pixels times the
+number of objects. Standard fully convolutional networks (FCN) \cite{long15fcn}
 will have trouble directly outputting all instance labels in a single shot.
 Recent work on instance segmentation \cite{silberman14insseg,
 zhang15insseg,zhang16insseg}  formulates complex graphical models, which
@@ -52,7 +50,7 @@ counting processes. For real-world cluttered scenes, iterative counting with
 attention will likely perform better than a regression model that operates on
 the global image level.
 
-\b{\*{Contributions}. We proposed a novel model with recurrent attention
+\textbf{Contributions}. We proposed a novel model with recurrent attention
 dynamics in which we explicitly feed in the output from one time-step to
 facilitate occlusion reasoning in the next.  We focus on instance segmentation
 of a single object-type per image and evaluate our model on a number of
@@ -61,4 +59,4 @@ dataset \cite{minervini14cvppp}; 2) KITTI car segmentation dataset
 \cite{geiger12kitti}; and 3) on MS-COCO \cite{lin14mscoco} images, where we
 train two different models, on ``person'' and ``zebra'' categories.  We show
 state-of-the-art performance on both CVPPP and KITTI dataset, and impressive
-counting ability on MS-COCO. }
+counting ability on MS-COCO.

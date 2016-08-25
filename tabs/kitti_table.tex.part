@@ -1,24 +1,61 @@
 \begin{table}[t]
+
+\begin{minipage}[t]{\textwidth}
 \caption{KITTI vehicle segmentation results}
 \label{tab:kitti}
 \centering
 \begin{small}
-\begin{tabular}{l|llllll}
+% Resize box start
+\resizebox{\textwidth}{!}{
+\begin{tabular}{l|lllll}
 \toprule
 \toprule
-                                 & \*{FG IoU} \u & \*{MWCov} \u & \*{MUCov} \u & \*{AvgFP} \d & \*{AvgFN} \d \\
-\midrule
-No Sched. Samp.                  & \b{87.2}      & \b{77.5}     & \b{63.0}     & \b{\*{0.069}}& \b{0.271}    \\
-No Post Proc.                    & \b{83.0}      & \b{83.0}     & \b{71.4}     & \b{0.201}    & \b{0.361}    \\
+                                 & \*{FG IoU} \u & \*{MWCov} \u & \*{MUCov} \u & \*{AvgFP} \d  & \*{AvgFN} \d \\
+% \midrule
+% No Sched. Samp.                  & \b{87.2}      & \b{77.5}     & \b{63.0}     & \b{\*{0.069}}& \b{0.271}    \\
+% No Post Proc.                    & \b{83.0}      & \b{83.0}     & \b{71.4}     & \b{0.201}    & \b{0.361}    \\
 \midrule    
-DenseCRFv1 \cite{zhang15insseg}  & 77.3          & 70.9         & 52.2         & 0.597        & 0.736        \\
-DenseCRFv2 \cite{zhang16insseg}  & 78.5          & 74.1         & 55.2         & 0.417        & 0.833        \\
-FCN+Depth \cite{uhrig16insseg}   & 84.1          & 79.7         & \*{75.8}     & 0.201        & \*{0.159}    \\
+DenseCRFv1 \cite{zhang15insseg}  & 77.3          & 70.9         & 52.2         & 0.597         & 0.736        \\
+DenseCRFv2 \cite{zhang16insseg}  & 78.5          & 74.1         & 55.2         & 0.417         & 0.833        \\
+FCN+Depth \cite{uhrig16insseg}   & 84.1          & 79.7         & \*{75.8}     & 0.201         & \*{0.159}    \\
 \midrule
-Ours (Canvas)                    & \b{86.4}      & \b{70.9}     & \b{56.8}     & \b{\*{0.069}}& \b{0.298}    \\
-Ours (FCN + Canvas)              & \b{\*{87.4}}  & \b{81.9}     & \b{67.9}     & \b{0.146}    & \b{0.299}    \\
-Ours (FCN + ConvLSTM)            & \b{\*{87.4}}  & \b{\*{83.2}} & \b{69.9}     & \b{0.118}    & \b{0.278}    \\
+% Ours (Canvas)                    & \b{86.4}      & \b{70.9}     & \b{56.8}     & \b{\*{0.069}}& \b{0.298}    \\
+% Ours (FCN + Canvas)              & \b{\*{87.4}}  & \b{81.9}     & \b{67.9}     & \b{0.146}    & \b{0.299}    \\
+Ours                             & \b{\*{87.4}}  & \b{\*{83.2}} & \b{69.9}     & \b{\*{0.118}} & \b{0.278}    \\
 \bottomrule
 \end{tabular}
+}
+% Resize box end
 \end{small}
+\end{minipage}
+% \end{table}
+% \begin{table}[t]
+
+\vspace{10pt}
+
+\begin{minipage}[t]{\textwidth}\caption{KITTI vehicle segmentation ablation}
+\label{tab:kitti}
+\centering
+\begin{small}
+% Resize box start
+\resizebox{\textwidth}{!}{
+\begin{tabular}{l|lllll}
+\toprule
+\toprule
+                                 & \*{FG IoU} \u & \*{MWCov} \u & \*{MUCov} \u & \*{AvgFP} \d  & \*{AvgFN} \d \\
+\midrule
+No Box Net                       &               &              &              &               &              \\
+No FCN                           & \b{86.4}      & \b{70.9}     & \b{56.8}     & \b{\*{0.069}}& \b{0.298}     \\
+No Sched. Samp.                  & \b{87.2}      & \b{77.5}     & \b{63.0}     & \b{\*{0.069}} & \b{\*{0.271}}\\
+No Post Proc.                    & \b{83.0}      & \b{83.0}     & \b{71.4}     & \b{0.201}     & \b{0.361}    \\
+Ours (Canvas)                    & \b{\*{87.4}}  & \b{81.9}     & \b{67.9}     & \b{0.146}     & \b{0.299}    \\
+\midrule
+Ours (CLSTM)                     & \b{\*{87.4}}  & \b{\*{83.2}} & \b{69.9}     & \b{0.118}     & \b{0.278}    \\
+\bottomrule
+\end{tabular}
+}
+% Resize box end
+\end{small}
+\end{minipage}
+
 \end{table}

@@ -16,8 +16,8 @@ performance on KITTI car segmentation dataset. We trained the model with 3712
 training images, and report performance on 144 test images. We also examine the
 relative importance of model components via ablation studies.
 
-\textbf{MS-COCO counting}. Additionally, we train class specific models on
-MS-COCO and test counting performance on the results. We chose ``person'' and
+\textbf{MS-COCO counting}. Additionally, we train class specific models on MS-
+COCO and test counting performance on the results. We chose ``person'' and
 ``zebra'' because these are the two of the most common classes in VQA
 questions. We report counting performance on images with at least one instance
 of the class: 677 zebra images, and 21,634 ``person'' images.
@@ -35,42 +35,36 @@ MUCov) for car segmentation (see Equations~\ref{eq:mwcov}, \ref{eq:mucov}). The
 coverage scores measure the instance-wise IoU for each ground-truth instance
 averaged over the image; MWCov further weights the score by the size of the
 ground-truth instance segmentation (larger objects get larger weights).
-%\vspace{-3pt}
-
 \begin{align}
 \label{eq:bd}
-\text{DICE}(A, B) &= \frac{2 |A \cup B|}{|A| + |B|} \ \ \ \ \ \ \ \
-\text{BD}(\{A_i\}, B) = \max_{i} \text{DICE}(A_i, B) \\
+\texttt{DICE}(A, B)                &= \frac{2 |A \cup B|}{|A| + |B|}      \\
+\texttt{BD}(\{A_i\}, B)            &= \max_{i} \texttt{DICE}(A_i, B)      \\
 \label{eq:sbd}
-\text{SBD}(\{\hat{y}_i\}, \{y_j\}) &= 
-\min \left(\frac{1}{N} \sum_j \text{BD}(\{\hat{y}_i\}, y_j), \frac{1}{N}
-\sum_i \text{BD}(\hat{y}_i, \{y_j\}) \right)
-\end{align}
-\vspace{-12pt}
-\begin{align}
-\label{eq:mwcov}
-\text{MWCov}(\{y_i\}, \{y_j^*\}) &= \frac{1}{N} \sum_i 
-\frac{|y_i|}{\sum_i |y_i|} \max_j
-\text{IoU}(y_i, y_j^*)\\
+\texttt{SBD}(y_i\}, \{y^*_j\})     &= \min \left(
+                                      \frac{1}{N} \sum_j 
+                                      \texttt{BD}(\{y_i\}, y^*_j),
+                                      \frac{1}{N} \sum_i
+                                      \texttt{BD}(y_i, \{y^*_j\}) \right) \\
 \label{eq:mucov}
-\text{MUCov}(\{y_i\}, \{y_j^*\}) &= \frac{1}{N} \sum_i 
-\max_j \text{IoU}(y_i, y_j^*)
+\texttt{MUCov}(\{y_i\}, \{y_j^*\}) &= \frac{1}{N} \sum_i 
+                                      \max_j \texttt{IoU}(y_i, y_j^*)     \\
+\label{eq:mwcov}
+\texttt{MWCov}(\{y_i\}, \{y_j^*\}) &= \frac{1}{N} \sum_i 
+                                      \frac{|y_i|}{\sum_i |y_i|}
+                                      \max_j \texttt{IoU}(y_i, y_j^*)
 \end{align}
 
-Counting is measured in absolute difference in count (|DiC|) (see
-Equation~\ref{eq:dic}), average false positive (AvgFP), and average false
-negative (AvgFN). False positive is the number of predicted instances that do
-not overlap with the ground-truth, and false negative is the number of 
-ground-truth instances that do not overlap with the prediction.
-\vspace{-3pt}
+Counting is measured in absolute difference in count (\texttt{|DiC|}) (see
+Equation~\ref{eq:dic}), average false positive (\texttt{AvgFP}), and average
+false negative (\texttt{AvgFN}). False positive is the number of predicted
+instances that do not overlap with the ground-truth, and false negative is the
+number of  ground-truth instances that do not overlap with the prediction.
 \begin{align}
 \label{eq:dic}
-|DiC| = \frac{1}{N}\sum_i |count_i - count_i^*|
+\texttt{|DiC|} = \frac{1}{N}\sum_i |count_i - count_i^*|
 \end{align}
-\vspace{-12pt}
 
 \subsection{Results \& discussion}
-\vspace{-3pt}
 In the leaf segmentation task, our best model outperforms the previous 
 state-of-the-art by a large margin in both segmentation and counting.
 Table~\ref{tab:cvppp} shows that the models with FCN overfit and 
@@ -100,8 +94,8 @@ From the figures above we see our model is handling a significant amount of
 object occlusion and truncation. We verified that the external memory helps
 with the counting process as the network first segments the more salient
 objects and then accounts for the occluded instances. In addition, our
-segmentation network can handle a range of object sizes because of the
-design of the box network.
+segmentation network can handle a range of object sizes because of the design
+of the box network.
 
 We found that using scheduled sampling results in much better performance. It
 helps by making training resemble testing, gradually forcing the model to carry

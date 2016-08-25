@@ -4,7 +4,7 @@ Instance segmentation has recently received a burst of research attention, as
 it provides higher level of precision of image understanding compared to object
 detection and semantic segmentation.
 
-\textbf{Instance segmentation using graphical models}.An early exploration of
+\textbf{Instance segmentation using graphical models}. An early exploration of
 instance segmentation proposes a multi-stage pipeline composed of patch-wise
 features based on deep learning, combined into a segmentation tree
 \cite{silberman14insseg}. They formulated a new loss function, the coverage
@@ -18,30 +18,28 @@ strong results on the challenging KITTI object dataset; however, the graphical
 model formulation entails long running times, and their energy functions are
 dependent on instances being connected and having a clear depth ordering.
 
-\textbf{Instance segmentation using CNN}. 
-\b{ Pinheiro et al.~\cite{pinheiro15seg} trained a CNN to generate object
-segmentation proposals, which ran densely on all windows at multiple scales. 
-The output of their proposed system requires further processing to get final 
-instance-level segmentations.}
-Liang et al.~\cite{liang15pfinsseg}
-used a CNN to generate pixel-level object size information, and used clustering
-as a post-processing step. They added a regressor at the top of the CNN to
-estimate the count, which is the total number of clusters. An erroneous count
-can usually leads to poor segmentation. Dai et al.~\cite{dai15insaware}
-proposed a pipeline-based approach and won the MS-COCO instance segmentation
-challenge. Their method first predicts bounding box proposals and extracts
-regions of interest (ROI), then uses shared features to perform segmentation
-within each ROI. Their architecture can also be fine-tuned end-to-end. However,
-since their method is based on detector proposals, it does not explicitly
-handle object occlusions, which may lead it to fail during  non- maximal
-suppression (NMS). Uhrig et al.~\cite{uhrig16insseg} presented another approach
-with FCN, and achieved very impressive results. Their FCN outputs three
-channels: semantic segmentation, object orientation and depth. Post-processing
-based on template matching and instance fusion produce the instance identities.
-Their approach is based on bottom-up clustering since their FCN can only
-provide pixel-level information, whereas our model is processing the image in a
-top-down fashion. Importantly, they also used ground-truth depth labels in
-training their model.
+\textbf{Instance segmentation using CNN}. Pinheiro et al.~\cite{pinheiro15seg}
+trained a CNN to generate object segmentation proposals, which ran densely on
+all windows at multiple scales. The output of their proposed system requires
+further processing to get final instance-level segmentations. Liang et
+al.~\cite{liang15pfinsseg} used a CNN to generate pixel-level object size
+information, and used clustering as a post- processing step. They added a
+regressor at the top of the CNN to estimate the count, which is the total
+number of clusters. An erroneous count can usually leads to poor segmentation.
+Dai et al.~\cite{dai15insaware} proposed a pipeline-based approach and won the
+MS-COCO instance segmentation challenge. Their method first predicts bounding
+box proposals and extracts regions of interest (ROI), then uses shared features
+to perform segmentation within each ROI. Their architecture can also be fine-
+tuned end-to-end. However, since their method is based on detector proposals,
+it does not explicitly handle object occlusions, which may lead it to fail
+during  non- maximal suppression (NMS). Uhrig et al.~\cite{uhrig16insseg}
+presented another approach with FCN, and achieved very impressive results.
+Their FCN outputs three channels: semantic segmentation, object orientation and
+depth. Post-processing based on template matching and instance fusion produce
+the instance identities. Their approach is based on bottom-up clustering since
+their FCN can only provide pixel-level information, whereas our model is
+processing the image in a top-down fashion. Importantly, they also used ground-
+truth depth labels in training their model.
 
 \textbf{Instance segmentation using RNN}. Another recent line of research, e.g.
 \cite{stewart15lstmdet, park15ris, romeraparedes15ris} employs end-to-end
@@ -55,14 +53,11 @@ attention mechanism \cite{xu15caption}. Romera-Paredes and Torr
 \cite{romeraparedes15ris} use convolutional LSTM (ConvLSTM)
 \cite{shi2015convlstm} to produce instance segmentation directly. However,
 since their ConvLSTM is required to handle object detection, inhibition, and
-segmentation all 
-%at the same time 
-\b{convolutionally} on a global scale, the final output loses
-precision. They add a dense CRF to restore the resolution.
-\b{ Contrast to their approach, our segmentation network has a box network that
-confines the instance-wise pixel segmentation within a local window.}
-Instead of resorting to graphical models, we added skip connections to restore
-the resolution.
+segmentation all convolutionally on a global scale, the final output loses
+precision. They add a dense CRF to restore the resolution. Contrast to their
+approach, our segmentation network has a box network that confines the
+instance-wise pixel segmentation within a local window. Instead of resorting to
+graphical models, we added skip connections to restore the resolution.
 
 \textbf{Instance counting}. Previous work on object counting in images has
 mainly focused on crowds of pedestrians and biological cells
