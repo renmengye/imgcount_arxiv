@@ -13,10 +13,8 @@
 \resizebox{\columnwidth}{!}{
 \begin{tabular}{ccccccc}
 Image & GT & Ours & & Image & GT & Ours \\
-% \cocoZebraImgH{000000358555} 
-% \cocoZebraImgH{000000064359} & & \cocoZebraImgH{000000014820} \\
-\\
-% \cocoZebraImgV{000000393805} & & \cocoZebraImgV{000000070158} \\
+\cocoZebraImgH{000000358555} & & \cocoZebraImgH{000000014820} \\
+\cocoZebraImgV{000000393805} & & \cocoZebraImgV{000000070158} \\
 \end{tabular}
 }
 \caption{Examples of our instance segmentation output on MS-COCO zebra images.}

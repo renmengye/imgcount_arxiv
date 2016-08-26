@@ -1,7 +1,7 @@
 \section{Recurrent attention model} 
 
 Our proposed model has four major components:
-A) a \*{2D external memory} that tracks the state of the segmented objects;
+A) an \*{external memory} that tracks the state of the segmented objects;
 B) a \*{box proposal network} responsible for localizing objects of interest;
 C) a \*{segmentation network}  for segmenting image pixels within the box; and
 D) a \*{scoring network} that determines if an object instance has been found,
@@ -182,7 +182,7 @@ function produces final segmentation values between 0 and 1.
 \*v_t         &= \texttt{CNN}(\*p_t)                                         \\
 \tilde{\*y}_t &= \texttt{D-CNN}(\*v_t)                                       \\
 \*y_t         &= \texttt{sigmoid} \left(\gamma \cdot 
-                 \texttt{Extract}(\tilde{\*y}_t, F_Y^T, F_X^T)
+                 \texttt{Extract}(\tilde{\*y}_t, F_Y^\top, F_X^\top)
                  -\beta \right)
 \end{align}
 
