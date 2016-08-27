@@ -128,7 +128,7 @@ locations, and $\tau$ indexes the glimpses.
 
 We pass the LSTM's hidden state through a linear layer to obtain predicted
 box coordinates. We parameterize the box by its normalized center
-$\(g_X,g_Y\}$, and log size $\log \delta_{X,Y}$. A scaling factor $\gamma$ is
+$(g_X,g_Y)$, and log size $\log (\delta_X,\delta_Y)$. A scaling factor $\gamma$ is
 also predicted by the linear layer, and used when re-projecting the patch
 to the original image size.
 \begin{align}
