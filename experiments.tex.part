@@ -40,11 +40,11 @@ ground-truth instance segmentation (larger objects get larger weights).
 \texttt{DICE}(A, B)                &= \frac{2 |A \cup B|}{|A| + |B|}      \\
 \texttt{BD}(\{A_i\}, B)            &= \max_{i} \texttt{DICE}(A_i, B)      \\
 \label{eq:sbd}
-\texttt{SBD}(y_i\}, \{y^*_j\})     &= \min \left(
-                                      \frac{1}{N} \sum_j 
+\texttt{SBD}(y_i\}, \{y^*_j\})     &= \frac{1}{N} \min \left(
+                                      \sum_j 
                                       \texttt{BD}(\{y_i\}, y^*_j),
-                                      \frac{1}{N} \sum_i
-                                      \texttt{BD}(y_i, \{y^*_j\}) \right) \\
+                                      \sum_i
+                                      \texttt{BD}(\{y^*_j\}, y_i) \right) \\
 \label{eq:mucov}
 \texttt{MUCov}(\{y_i\}, \{y_j^*\}) &= \frac{1}{N} \sum_i 
                                       \max_j \texttt{IoU}(y_i, y_j^*)     \\

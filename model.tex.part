@@ -42,15 +42,16 @@ input preprocessing. This pretrained FCN has two parts of output. The first is
 a 1-channel pixel-level foreground segmentation, produced by a variant of the
 DeconvNet \cite{noh15deconv} with skip connections. In addition to predicting
 this foreground mask, as a second part we followed the work of Uhrig et al.
-\cite{uhrig16insseg} by producing a 2-d object angle map. For each foreground
-pixel, we calculate its relative angle towards the centroid of the object, and
-quantize the angle into 8 different classes, forming 8 channels, as shown in
-Figure~\ref{fig:fcn}. The angle map forces the model to learn object boundary
-information, which is missing in the foreground segmentation. The architecture
-and training of these components are detailed in the Appendix. For the plant
-segmentation experiment we did not find this preprocessing useful and instead
-we opted for the raw image pixels. We denote $\*{x}_0$ as the original image,
-and $\*{x}$ as the preprocessed image.
+\cite{uhrig16insseg} by producing an angle map for each object. For each
+foreground pixel, we calculate its relative angle towards the centroid of the
+object, and quantize the angle into 8 different classes, forming 8 channels, as
+shown in Figure~\ref{fig:fcn}. The angle map forces the model to learn object
+boundary information, which is missing in the foreground segmentation. The
+architecture and training of these components are detailed in the Appendix. For
+the plant segmentation experiment we did not find this preprocessing useful and
+instead we opted for the raw image pixels. We denote $\*{x}_0$ as the original
+image (3 channel RGB), and $\*{x}$ as the preprocessed image (9 channels: 1 for
+forground and 8 for angles).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -66,9 +67,10 @@ precisely deal with occlusion.
 
 1. \textbf{\textit{Cumulative canvas}}. We hypothesize that providing
 information of the completed segmentation helps the network reason about
-occluded objects and determine the next region of interest. The first channel
-of the canvas keeps adding new pixels from the output of the previous time
-step.
+occluded objects and determine the next region of interest. The canvas has 10
+channels in total: the first channel of the canvas keeps adding new pixels from
+the output of the previous time step, and the rest channels keeps the input
+image.
 \begin{align}
 &\*{c}_t                 = \begin{cases}
                                 \*{0},              & \text{if } t = 0       \\
@@ -86,10 +88,10 @@ training. An alternative is to learn the ``addition'' operation with another
 RNN. Convolutional Long Short-Term Memory (ConvLSTM) \cite{shi2015convlstm} is
 a form of RNN that uses convolution as its recurrent operator and thus is able
 to efficiently process a 2D image input and store a 2D hidden state. We
-initialize the hidden state of the ConvLSTM with the FCN output, and feed the
-output segmentation back into the ConvLSTM (See Figure~\ref{fig:model_arch},
-right). This allows the gradient to flow through the ConvLSTM without
-introducing instability.
+initialize the hidden state of the ConvLSTM with the FCN output, pad the rest
+of the initial hidden state with zeros, and feed the output segmentation back
+into the ConvLSTM (See Figure~\ref{fig:model_arch}, right). This allows the
+gradient to flow through the ConvLSTM without introducing instability.
 \begin{align}
 \*{d}_t^{\text{clstm}} = \begin{cases}
                             [\*{x}, \*{0}, ..., \*{0}],   & \text{if } t = 0 \\
@@ -146,9 +148,16 @@ g_Y      &= (\tilde{g}_Y+1)H/2                                               \\
 
 \textbf{Extracting a sub-region}. We follow DRAW \cite{gregor15draw} and use a
 Gaussian interpolation kernel to extract an $N \times N$ patch from the
-$\tilde{x}$, a concatenation of the original image with $d_t$. We further allow
-the model to output rectangular patches to account for different shapes of the
-object.
+$\tilde{x}$, a concatenation of the original image with
+$\*d_t^{\text{canvas}}$. We used the canvas here for easier pre-training. We
+further allow the model to output rectangular patches to account for different
+shapes of the object. $i, j$ index the location in the patch of dimension
+($\tilde{H} \times \tilde{W}$), and $a, b$ index the location in the original
+image ($H \times W$) location. $F_X, F_Y$ are matrices of dimension $W \times
+\tilde{W}$ and $H \times \tilde{H}$, which indicates the contribution of the
+location $(a,b)$ in the original image towards the location $(i,j)$ in the
+extracted patch. $\mu_{X,Y}$ and $\sigma_{X,Y}$ are mean and variance of the
+Gaussian interpolation kernel, predicted by the box network.
 \begin{align}
 \mu_X^i         &= g_X + (\delta_X + 1) \cdot (i - N / 2 + 0.5) / N          \\
 \mu_Y^j         &= g_Y + (\delta_Y + 1) \cdot (j - N / 2 + 0.5) / N          \\
