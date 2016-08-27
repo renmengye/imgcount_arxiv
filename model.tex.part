@@ -14,9 +14,9 @@ illustration of these components.
 architecture:
 $\*{x} \in \mathbb{R}^{H \times W \times C}$
 is the input image
-($H$, $W$ denotes the dimension, and $C$ denotes the colour channel);
+($H$, $W$ denotes the dimension, and $C$ denotes the color channel);
 $t$ indexes the iterations of the model, and 
-$\tau$ indexes the glimpses of the inner RNN;
+$\tau$ indexes the glimpses of the inner RNN, in the box network;
 $\*y   = \{\*{y}_t | \*{y}_t \in (0, 1)^{H \times W}\}_{t=1}^T$,
 $\*y^* = \{\*{y}^*_t | \*{y}^*_t \in \{0, 1\}^{H \times W}\}_{t=1}^T$
 is the output/ground-truth segmentation sequence;
@@ -38,20 +38,21 @@ denotes passing an input $x$ through a multi-layer perceptron (MLP) and
 returning the hidden state $h$.
 
 \textbf{Input preprocessing}. We pretrain a FCN \cite{long15fcn} to perform
-input preprocessing. This pretrained FCN has two parts of output. The first is
+input preprocessing. This pretrained FCN has two output components. The first is
 a 1-channel pixel-level foreground segmentation, produced by a variant of the
 DeconvNet \cite{noh15deconv} with skip connections. In addition to predicting
-this foreground mask, as a second part we followed the work of Uhrig et al.
+this foreground mask, as a second component we followed the work of Uhrig et al.
 \cite{uhrig16insseg} by producing an angle map for each object. For each
 foreground pixel, we calculate its relative angle towards the centroid of the
 object, and quantize the angle into 8 different classes, forming 8 channels, as
-shown in Figure~\ref{fig:fcn}. The angle map forces the model to learn object
-boundary information, which is missing in the foreground segmentation. The
-architecture and training of these components are detailed in the Appendix. For
-the plant segmentation experiment we did not find this preprocessing useful and
-instead we opted for the raw image pixels. We denote $\*{x}_0$ as the original
+shown in Figure~\ref{fig:fcn}. Predicting the angle map forces the model
+to encode more detailed information about object boundaries. The
+architecture and training of these components are detailed in the Appendix.
+% (later) For the plant segmentation experiment we did not find this
+% preprocessing useful and instead we opted for the raw image pixels. 
+We denote $\*{x}_0$ as the original
 image (3 channel RGB), and $\*{x}$ as the preprocessed image (9 channels: 1 for
-forground and 8 for angles).
+foreground and 8 for angles).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -69,8 +70,8 @@ precisely deal with occlusion.
 information of the completed segmentation helps the network reason about
 occluded objects and determine the next region of interest. The canvas has 10
 channels in total: the first channel of the canvas keeps adding new pixels from
-the output of the previous time step, and the rest channels keeps the input
-image.
+the output of the previous time step, and the other channels store the 
+input image.
 \begin{align}
 &\*{c}_t                 = \begin{cases}
                                 \*{0},              & \text{if } t = 0       \\
@@ -105,15 +106,15 @@ gradient to flow through the ConvLSTM without introducing instability.
 \subsection{Part B: Box network}
 
 The box network localizes objects of interest. The CNN in the box network
-outputs a $H' \times W' \times L$ feature map $\*{u}_{t}$, ($H'$ is the height;
+outputs a $H' \times W' \times L$ feature map $\*{u}_{t}$ ($H'$ is the height;
 $W'$ is the width; $L$ is the feature dimension). CNN activation based on the
 entire image is too complex and inefficient to process simultaneously. Simple
-pooling does not preserve location; instead we employ a ``soft- attention''
+pooling does not preserve location; instead we employ a ``soft-attention''
 (dynamic pooling) mechanism here to extract useful information along spatial
-dimensions, weighted by $\alpha_t^{h, w}$. Since one single glimpse may not
+dimensions, weighted by $\alpha_t^{h, w}$. Since a single glimpse may not
 give the upper network enough information to decide where exactly to draw the
 box, we allow the glimpse LSTM to look at different locations by feeding a
-dimension $L$ vector each time. $\alpha$ is  initialized to be uniform over all
+dimension $L$ vector each time. $\alpha$ is initialized to be uniform over all
 locations, and $\tau$ indexes the glimpses.
 \begin{align}
 \*u_t            &= \texttt{CNN}(\*d_t)                                      \\
@@ -127,7 +128,7 @@ locations, and $\tau$ indexes the glimpses.
 
 We pass the LSTM's hidden state through a linear layer to obtain predicted
 box coordinates. We parameterize the box by its normalized center
-$g_{X,Y}$, and log size $\log \delta_{X,Y}$. A scaling factor $\gamma$ is
+$\(g_X,g_Y\}$, and log size $\log \delta_{X,Y}$. A scaling factor $\gamma$ is
 also predicted by the linear layer, and used when re-projecting the patch
 to the original image size.
 \begin{align}
