@@ -147,20 +147,22 @@ g_Y      &= (\tilde{g}_Y+1)H/2                                               \\
 \end{align}
 
 \textbf{Extracting a sub-region}. We follow DRAW \cite{gregor15draw} and use a
-Gaussian interpolation kernel to extract an $N \times N$ patch from the
-$\tilde{x}$, a concatenation of the original image with
+Gaussian interpolation kernel to extract an $\tilde{H} \times \tilde{W}$ patch
+from the $\tilde{x}$, a concatenation of the original image with
 $\*d_t^{\text{canvas}}$. We used the canvas here for easier pre-training. We
 further allow the model to output rectangular patches to account for different
 shapes of the object. $i, j$ index the location in the patch of dimension
-($\tilde{H} \times \tilde{W}$), and $a, b$ index the location in the original
-image ($H \times W$) location. $F_X, F_Y$ are matrices of dimension $W \times
-\tilde{W}$ and $H \times \tilde{H}$, which indicates the contribution of the
-location $(a,b)$ in the original image towards the location $(i,j)$ in the
-extracted patch. $\mu_{X,Y}$ and $\sigma_{X,Y}$ are mean and variance of the
-Gaussian interpolation kernel, predicted by the box network.
+$\tilde{H} \times \tilde{W}$, and $a, b$ index the location in the original
+image. $F_X$ and $F_Y$ are matrices of dimension $W \times \tilde{W}$ and $H
+\times \tilde{H}$, which indicates the contribution of the location $(a,b)$ in
+the original image towards the location $(i,j)$ in the extracted patch.
+$\mu_{X,Y}$ and $\sigma_{X,Y}$ are mean and variance of the Gaussian
+interpolation kernel, predicted by the box network.
 \begin{align}
-\mu_X^i         &= g_X + (\delta_X + 1) \cdot (i - N / 2 + 0.5) / N          \\
-\mu_Y^j         &= g_Y + (\delta_Y + 1) \cdot (j - N / 2 + 0.5) / N          \\
+\mu_X^i         &= g_X + (\delta_X + 1) \cdot
+                   (i - \tilde{W} / 2 + 0.5) / \tilde{W}                     \\
+\mu_Y^j         &= g_Y + (\delta_Y + 1) \cdot
+                   (j - \tilde{H} / 2 + 0.5) / \tilde{H}                     \\
 F_X^{a, i}      &= \frac{1}{\sqrt{2\pi} \sigma_X}                             
                    \exp \left(- \frac{(a - \mu_X^i)^2}{2\sigma_X^2} \right)  \\
 F_Y^{b, j}      &= \frac{1}{\sqrt{2\pi} \sigma_Y}

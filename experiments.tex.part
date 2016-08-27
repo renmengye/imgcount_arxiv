@@ -84,18 +84,27 @@ detect distant cars.
 In the zebra counting task, we found that our model outperforms the detector
 and NMS method, and associative-subitizing methods~\cite{chattopadhyay16count},
 but we are not doing as well in the person category. However, relative to these
-regression-based methods,  our model permits insight into the recognition of
+regression-based methods, our model permits insight into the recognition of
 each instance by inspecting the output segmentation. Figure~\ref{fig:count}
 shows the relation between counting performance and number of instances. Mean
 absolute difference in count is around 1 for up to 18 leaves, 7 cars, 7 zebras
 and 3 people.
 
-From the figures above we see our model is handling a significant amount of
-object occlusion and truncation. We verified that the external memory helps
-with the counting process as the network first segments the more salient
-objects and then accounts for the occluded instances. In addition, our
-segmentation network can handle a range of object sizes because of the design
-of the box network.
+In Figure \ref{fig:count}, instead of having a linear relation between counting
+error and groundtruth count, as appeared in most regression based model, our
+model is making much less errors in the low count regime in all four datasets,
+reflecting the nature of our iterative counting method, which delivers higher
+counting accuracy for small number of objects. Note that since our model is not
+trained to directly output the total count, but instead jointly with pixel-
+based loss function, it might give larger overall errors due to the model bias.
+
+From Figures \ref{fig:cvppp_out}, \ref{fig:kitti_out},
+\ref{fig:coco_person_out}, \ref{fig:coco_zebra_out} we see our model is
+handling a significant amount of object occlusion and truncation. We verified
+that the external memory helps with the counting process as the network first
+segments the more salient objects and then accounts for the occluded instances.
+In addition, our segmentation network can handle a range of object sizes
+because of the design of the box network.
 
 We found that using scheduled sampling results in much better performance. It
 helps by making training resemble testing, gradually forcing the model to carry

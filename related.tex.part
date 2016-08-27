@@ -20,26 +20,26 @@ dependent on instances being connected and having a clear depth ordering.
 
 \textbf{Instance segmentation using CNN}. Pinheiro et al.~\cite{pinheiro15seg}
 trained a CNN to generate object segmentation proposals, which ran densely on
-all windows at multiple scales. The output of their proposed system requires
-further processing to get final instance-level segmentations. Liang et
-al.~\cite{liang15pfinsseg} used a CNN to generate pixel-level object size
-information, and used clustering as a post- processing step. They added a
-regressor at the top of the CNN to estimate the count, which is the total
-number of clusters. An erroneous count can usually leads to poor segmentation.
-Dai et al.~\cite{dai15insaware} proposed a pipeline-based approach and won the
-MS-COCO instance segmentation challenge. Their method first predicts bounding
-box proposals and extracts regions of interest (ROI), then uses shared features
-to perform segmentation within each ROI. Their architecture can also be fine-
-tuned end-to-end. However, since their method is based on detector proposals,
-it does not explicitly handle object occlusions, which may lead it to fail
-during  non- maximal suppression (NMS). Uhrig et al.~\cite{uhrig16insseg}
-presented another approach with FCN, and achieved very impressive results.
-Their FCN outputs three channels: semantic segmentation, object orientation and
-depth. Post-processing based on template matching and instance fusion produce
-the instance identities. Their approach is based on bottom-up clustering since
-their FCN can only provide pixel-level information, whereas our model is
-processing the image in a top-down fashion. Importantly, they also used ground-
-truth depth labels in training their model.
+all windows at multiple scales. The output of their proposed system are object
+proposals, which require further processing to get final instance-level
+segmentations. Liang et al.~\cite{liang15pfinsseg} used a CNN to generate
+pixel-level object size information, and used clustering as a post- processing
+step. They added a regressor at the top of the CNN to estimate the count, which
+is the total number of clusters. An erroneous count can usually leads to poor
+segmentation. Dai et al.~\cite{dai15insaware} proposed a pipeline-based
+approach and won the MS-COCO instance segmentation challenge. Their method
+first predicts bounding box proposals and extracts regions of interest (ROI),
+then uses shared features to perform segmentation within each ROI. Their
+architecture can also be fine- tuned end-to-end. However, since their method is
+based on detector proposals, it does not explicitly handle object occlusions,
+which may lead it to fail during  non- maximal suppression (NMS). Uhrig et
+al.~\cite{uhrig16insseg} presented another approach with FCN, and achieved very
+impressive results. Their FCN outputs three channels: semantic segmentation,
+object orientation and depth. Post-processing based on template matching and
+instance fusion produce the instance identities. Their approach is based on
+bottom-up clustering since their FCN can only provide pixel-level information,
+whereas our model is processing the image in a top-down fashion. Importantly,
+they also used ground- truth depth labels in training their model.
 
 \textbf{Instance segmentation using RNN}. Another recent line of research, e.g.
 \cite{stewart15lstmdet, park15ris, romeraparedes15ris} employs end-to-end
