@@ -12,7 +12,7 @@ illustration of these components.
 
 \textbf{Notation}. We use the following notation to describe the model
 architecture:
-$\*{x_0} \in \mathbb{R}^{H \times W \times C}$
+$\*{x}_0 \in \mathbb{R}^{H \times W \times C}$
 is the input image
 ($H$, $W$ denotes the dimension, and $C$ denotes the color channel);
 $t$ indexes the iterations of the model, and 
