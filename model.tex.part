@@ -12,11 +12,11 @@ illustration of these components.
 
 \textbf{Notation}. We use the following notation to describe the model
 architecture:
-$\*{x} \in \mathbb{R}^{H \times W \times C}$
+$\*{x_0} \in \mathbb{R}^{H \times W \times C}$
 is the input image
 ($H$, $W$ denotes the dimension, and $C$ denotes the color channel);
 $t$ indexes the iterations of the model, and 
-$\tau$ indexes the glimpses of the inner RNN, in the box network;
+$\tau$ indexes the glimpses of the box network's inner RNN;
 $\*y   = \{\*{y}_t | \*{y}_t \in (0, 1)^{H \times W}\}_{t=1}^T$,
 $\*y^* = \{\*{y}^*_t | \*{y}^*_t \in \{0, 1\}^{H \times W}\}_{t=1}^T$
 is the output/ground-truth segmentation sequence;
@@ -97,7 +97,7 @@ gradient to flow through the ConvLSTM without introducing instability.
 \*{d}_t^{\text{clstm}} = \begin{cases}
                             [\*{x}, \*{0}, ..., \*{0}],   & \text{if } t = 0 \\
                             \texttt{ConvLSTM}(
-                            \*{d}_{t-1}, \*{y}_{t-1}),    & \text{otherwise}
+                            \*{d}_{t-1}^{\text{clstm}}, \*{y}_{t-1}),    & \text{otherwise}
                          \end{cases}
 \end{align}
 
@@ -128,7 +128,7 @@ locations, and $\tau$ indexes the glimpses.
 
 We pass the LSTM's hidden state through a linear layer to obtain predicted
 box coordinates. We parameterize the box by its normalized center
-$(g_X,g_Y)$, and log size $\log (\delta_X,\delta_Y)$. A scaling factor $\gamma$ is
+$(g_X,g_Y)$, and size $(\log \delta_X, \log \delta_Y)$. A scaling factor $\gamma$ is
 also predicted by the linear layer, and used when re-projecting the patch
 to the original image size.
 \begin{align}
@@ -138,7 +138,7 @@ to the original image size.
  \log \tilde{\delta}_Y, 
  \log \sigma_X,
  \log \sigma_Y,
- \gamma]                  &=  \*{w}_b^\top \*{z}_{t, \text{end}} + \*{b}_b
+ \gamma]                  &=  \*{w}_b^\top \*{z}_{t, \text{end}} + \*{w}_{b0}
 \end{align}
 \begin{align}
 g_X      &= (\tilde{g}_X+1)W/2                                               \\
@@ -170,7 +170,7 @@ F_Y^{b, j}      &= \frac{1}{\sqrt{2\pi} \sigma_Y}
                    \exp \left(- \frac{(b - \mu_Y^j)^2}{2\sigma_Y^2} \right)
 \end{align}
 \begin{align}
-\tilde{\*x}     &= [\*{x}_0, \*{d}_t^{\text{canvas}}]                        \\
+\tilde{\*x}_t     &= [\*{x}_0, \*{d}_t^{\text{canvas}}]                        \\
 \*p_t           &= \texttt{Extract}(\tilde{\*{x}}_t, F_Y, F_X) 
             \equiv F_Y^T \tilde{\*{x}}_t F_X
 \end{align}
@@ -180,15 +180,19 @@ F_Y^{b, j}      &= \frac{1}{\sqrt{2\pi} \sigma_Y}
 \subsection{Part C: Segmentation network}
 
 The remaining task is to segment out the pixels that belong to the dominant
-object within the window. In the segmentation network, we adopt a variant of
+object within the window. The segmentation network first
+utilizes a convolution network to produce a feature map $\*v_t$.
+We then adopt a variant of
 the DeconvNet \cite{noh15deconv} with skip connections, which appends
-deconvolution (or convolution transpose) layers after convolution layers to
-upsample the low-resolution feature map to a full-size segmentation. After the
-fully convolutional layers, we get a patch-level segmentation prediction heat
-map $\tilde{y}_t$. We then re-project this patch prediction to the original
-image using the transpose of the previous computed Gaussian filters. The
-learned $\gamma$ to magnifies the signal within the bounding box, and a
-constant $\beta$ to suppresses the pixels outside the box. Lastly, the sigmoid
+deconvolution (or convolution transpose) layers to
+upsample the low-resolution feature map to a full-size segmentation. 
+After the 
+fully convolutional layers (Mengye - should this be "fully de-convolutional"?), 
+we get a patch-level segmentation prediction heat map $\tilde{y}_t$. 
+We then re-project this patch prediction to the original
+image using the transpose of the previously computed Gaussian filters; the
+learned $\gamma$ magnifies the signal within the bounding box, and a
+constant $\beta$ suppresses the pixels outside the box. Applying the sigmoid
 function produces final segmentation values between 0 and 1.
 \begin{align}
 \*v_t         &= \texttt{CNN}(\*p_t)                                         \\
@@ -205,12 +209,11 @@ function produces final segmentation values between 0 and 1.
 To estimate the number of objects in the image, and to terminate our sequential
 process, we incorporate a scoring network, similar to the one presented in
 \cite{romeraparedes15ris}. Our scoring network takes information from the
-hidden states of both box network ($z_t$) and segmentation network ($v_t$) to
+hidden states of both the box network ($z_t$) and segmentation network ($v_t$) to
 produce a score between 0 and 1.
 \begin{equation}
 s_{t} = \texttt{sigmoid}(\*w_{zs}^\top\*z_{t, \text{end}} + 
-                         \*w_{vs}^\top\*v_t + 
-                         \*b_s)
+                         \*w_{vs}^\top\*v_t + \*{w}_{s0})
 \end{equation}
 
 \textbf{Termination condition}. We train the entire model with a sequence length
@@ -234,13 +237,14 @@ $\mathcal{L}_b$; and the score cross-entropy loss $\mathcal{L}_s$:
 \textbf{(a) Matching IoU loss (mIOU)}. A primary challenge of instance
 segmentation involves matching model and ground-truth instances.  we compute a
 maximum-weighted  bipartite graph matching between the output instances and
-ground-truth instances \cite{stewart15lstmdet} and \cite{romeraparedes15ris}.
+ground-truth instances (c.f., \cite{stewart15lstmdet} and 
+\cite{romeraparedes15ris}).
 Matching makes the loss insensitive to the ordering of the ground-truth
 instances. Unlike coverage scores proposed in \cite{silberman14insseg} it
-directly penalizes both false positive and false negative segmentation. The
+directly penalizes both false positive and false negative segmentations. The
 matching weight $\mathcal{M}_{i, j}$ is the IoU score between a pair of
-segmentation. We use the Hungarian algorithm to compute the matching, and it
-does not back-prop gradient in the network.
+segmentations. We use the Hungarian algorithm to compute the matching; we
+do not back-propagate the network gradients through this algorithm.
 \begin{align}
 \mathcal{M}_{i, j}        &= \texttt{softIOU}(\*y_i, \*y^*_j) 
                       \equiv \frac{\sum \*y_i \cdot \*y^*_j}
@@ -266,7 +270,7 @@ box that is  scaled proportionally in both height and width.
 \end{align}
 
 \textbf{(c) Monotonic score loss}. To facilitate automatic termination, the
-network should output more confident objects first. We proposed a loss function
+network should output more confident objects first. We formulate a loss function
 that encourages monotonically decreasing values in the score output. Iterations
 with target score 1 are compared to the lower bound of subsequent scores, and 0
 targets to the upper bound of preceding scores.
