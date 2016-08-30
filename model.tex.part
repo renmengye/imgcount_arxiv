@@ -287,6 +287,7 @@ scores, and 0 targets to the upper bound of preceding scores.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Training procedure and post-processing}
+\label{sec:postproc}
 
 \textbf{Bootstrap training}. The box and segmentation networks rely on the
 output of each other to make decisions for the next time-step. Because of the
