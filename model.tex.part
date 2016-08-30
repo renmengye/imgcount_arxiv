@@ -97,7 +97,8 @@ gradient to flow through the ConvLSTM without introducing instability.
 \*{d}_t^{\text{clstm}} = \begin{cases}
                             [\*{x}, \*{0}, ..., \*{0}],   & \text{if } t = 0 \\
                             \texttt{ConvLSTM}(
-                            \*{d}_{t-1}^{\text{clstm}}, \*{y}_{t-1}),    & \text{otherwise}
+                            \*{d}_{t-1}^{\text{clstm}},
+                            \*{y}_{t-1}),                 & \text{otherwise}
                          \end{cases}
 \end{align}
 
@@ -170,7 +171,7 @@ F_Y^{b, j}      &= \frac{1}{\sqrt{2\pi} \sigma_Y}
                    \exp \left(- \frac{(b - \mu_Y^j)^2}{2\sigma_Y^2} \right)
 \end{align}
 \begin{align}
-\tilde{\*x}_t     &= [\*{x}_0, \*{d}_t^{\text{canvas}}]                        \\
+\tilde{\*x}_t   &= [\*{x}_0, \*{d}_t^{\text{canvas}}]                        \\
 \*p_t           &= \texttt{Extract}(\tilde{\*{x}}_t, F_Y, F_X) 
             \equiv F_Y^T \tilde{\*{x}}_t F_X
 \end{align}
@@ -180,20 +181,21 @@ F_Y^{b, j}      &= \frac{1}{\sqrt{2\pi} \sigma_Y}
 \subsection{Part C: Segmentation network}
 
 The remaining task is to segment out the pixels that belong to the dominant
-object within the window. The segmentation network first
-utilizes a convolution network to produce a feature map $\*v_t$.
-We then adopt a variant of
-the DeconvNet \cite{noh15deconv} with skip connections, which appends
-deconvolution (or convolution transpose) layers to
-upsample the low-resolution feature map to a full-size segmentation. 
-After the 
-fully convolutional layers (Mengye - should this be "fully de-convolutional"?), 
-we get a patch-level segmentation prediction heat map $\tilde{y}_t$. 
-We then re-project this patch prediction to the original
-image using the transpose of the previously computed Gaussian filters; the
-learned $\gamma$ magnifies the signal within the bounding box, and a
-constant $\beta$ suppresses the pixels outside the box. Applying the sigmoid
-function produces final segmentation values between 0 and 1.
+object within the window. The segmentation network first utilizes a
+convolution network to produce a feature map $\*v_t$. We then adopt a variant
+of the DeconvNet \cite{noh15deconv} with skip connections, which appends
+deconvolution (or convolution transpose) layers to upsample the low-resolution
+feature map to a full-size segmentation. After the fully convolutional layers
+% Mengye - should this be "fully de-convolutional"? 
+% Rich - de-convolution here is still doing convolution (same operator, just
+% transpose the filters. Stride 2 in regular convolution becomes stride 1/2 in
+% deconvolution).
+we get a patch-level segmentation prediction heat map $\tilde{y}_t$. We then
+re-project this patch prediction to the original image using the transpose of
+the previously computed Gaussian filters; the learned $\gamma$ magnifies the
+signal within the bounding box, and a constant $\beta$ suppresses the pixels
+outside the box. Applying the sigmoid function produces final segmentation
+values between 0 and 1.
 \begin{align}
 \*v_t         &= \texttt{CNN}(\*p_t)                                         \\
 \tilde{\*y}_t &= \texttt{D-CNN}(\*v_t)                                       \\
@@ -216,9 +218,9 @@ s_{t} = \texttt{sigmoid}(\*w_{zs}^\top\*z_{t, \text{end}} +
                          \*w_{vs}^\top\*v_t + \*{w}_{s0})
 \end{equation}
 
-\textbf{Termination condition}. We train the entire model with a sequence length
-determined by the maximum number of objects plus one. During inference, we cut
-off iterations once the output score goes below 0.5. The loss function
+\textbf{Termination condition}. We train the entire model with a sequence
+length determined by the maximum number of objects plus one. During inference,
+we cut off iterations once the output score goes below 0.5. The loss function
 (described below) encourages scores to decrease monotonically.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -270,10 +272,10 @@ box that is  scaled proportionally in both height and width.
 \end{align}
 
 \textbf{(c) Monotonic score loss}. To facilitate automatic termination, the
-network should output more confident objects first. We formulate a loss function
-that encourages monotonically decreasing values in the score output. Iterations
-with target score 1 are compared to the lower bound of subsequent scores, and 0
-targets to the upper bound of preceding scores.
+network should output more confident objects first. We formulate a loss
+function that encourages monotonically decreasing values in the score output.
+Iterations with target score 1 are compared to the lower bound of subsequent
+scores, and 0 targets to the upper bound of preceding scores.
 \begin{align}
 \mathcal{L}_s(\*s, \*s^*) &= \frac{1}{T}\sum_t
                              -s^*_t 

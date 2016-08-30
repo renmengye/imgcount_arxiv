@@ -6,7 +6,7 @@
 \centering
 \begin{small}
 % Resize box start
-\resizebox{\textwidth}{!}{
+% \resizebox{\textwidth}{!}{
 \begin{tabular}{l|lllll}
 \toprule
 \toprule
@@ -22,7 +22,7 @@ FCN+Depth
 Ours                 & \*{87.4}  & \*{83.2} & 69.9     & \*{0.118} & 0.278     \\
 \bottomrule
 \end{tabular}
-}
+% }
 % Resize box end
 \end{small}
 \end{minipage}
@@ -36,7 +36,7 @@ Ours                 & \*{87.4}  & \*{83.2} & 69.9     & \*{0.118} & 0.278     \
 \centering
 \begin{small}
 % Resize box start
-\resizebox{\textwidth}{!}{
+% \resizebox{\textwidth}{!}{
 \begin{tabular}{l|lllll}
 \toprule
 \toprule
@@ -51,7 +51,7 @@ Ours (Canvas)    & \*{87.4}  & 81.9     & 67.9     & 0.146     & 0.299     \\
 Ours (CLSTM)     & \*{87.4}  & \*{83.2} & 69.9     & 0.118     & 0.278     \\
 \bottomrule
 \end{tabular}
-}
+% }
 % Resize box end
 \end{small}
 \end{minipage}

@@ -4,73 +4,65 @@ Instance segmentation is a fundamental computer vision problem, which aims to
 assign pixel-level instance labelling to a given image.  While the standard
 semantic segmentation problem entails assigning class labels to each pixel in
 an image, it says nothing about the number of instances of each class in the
-image. Instance segmentation is considerably more difficult than semantic 
+image. Instance segmentation is considerably more difficult than semantic
 segmentation because it necessitates distinguishing nearby and occluded object
-instances. Segmenting
-at the instance level is useful for many tasks, such as highlighting the
-outline of objects for improved recognition and allowing robots to delineate
-and grasp individual objects; it plays a key role in autonomous driving as
-well. Obtaining instance level pixel labels is also
-an important step towards general machine understanding of images.
+instances. Segmenting at the instance level is useful for many tasks, such as
+highlighting the outline of objects for improved recognition and allowing
+robots to delineate and grasp individual objects; it plays a key role in
+autonomous driving as well. Obtaining instance level pixel labels is also an
+important step towards general machine understanding of images.
 
 One of the main challenges of instance segmentation is object occlusion.
-Classical object detection pipelines \cite{ren15fasterrcnn} are composed of four
-stages: proposals, scoring, refinement, and non-maximal suppression (NMS). NMS
-typically utilizes a hard threshold that is fixed for the entire dataset. In
-cluttered scenes, NMS may suppress the detection results for a heavily occluded
-object because it has too much overlap with foreground objects. This challenge
-remains in the problem of instance segmentation.
-%, which can be viewed as a difficult version of object detection. 
-One motivation of this work is to introduce a way
-of performing dynamic NMS to reason about occlusion.
+Classical object detection pipelines \cite{ren15fasterrcnn} are composed of
+four stages: proposals, scoring, refinement, and non-maximal suppression (NMS).
+NMS typically utilizes a hard threshold that is fixed for the entire dataset.
+In cluttered scenes, NMS may suppress the detection results for a heavily
+occluded object because it has too much overlap with foreground objects. This
+challenge remains in the problem of instance segmentation. One motivation of
+this work is to introduce a way of performing dynamic NMS to reason about
+occlusion.
 
-One approach to instance segmentation is to formulate it as a
-structured output problem.
-A key challenge here is the dimensionality of the
-structured output, which can be on the order of the number of pixels times
-the number of objects.
-Standard fully convolutional networks (FCN) \cite{long15fcn}
-will have trouble directly outputting all instance labels in a single shot.
-Recent work on instance segmentation \cite{silberman14insseg,
-zhang15insseg,zhang16insseg} proposes complex graphical models, which
-results in a complex and time-consuming pipeline. Furthermore, these models
-cannot be trained in an end-to-end fashion.
+One approach to instance segmentation is to formulate it as a structured output
+problem. A key challenge here is the dimensionality of the structured output,
+which can be on the order of the number of pixels times the number of objects.
+Standard fully convolutional networks (FCN) \cite{long15fcn} will have trouble
+directly outputting all instance labels in a single shot. Recent work on
+instance segmentation \cite{silberman14insseg, zhang15insseg,zhang16insseg}
+proposes complex graphical models, which results in a complex and
+time-consuming pipeline. Furthermore, these models cannot be trained in an
+end-to-end fashion.
 
-A related problem of interest entails
-counting the instances of an object class in an image.
-On its own this problem is also of practical value (Mengye: we had listed
-some applications in an earlier version).
-Studies in applications such as image question
-answering \cite{antol15vqa, ren15vqa} also reveal that counting, especially on
-everyday objects, is a very challenging task on its own
-\cite{chattopadhyay16count}.
-Counting has been formulated in a
-task-specific setting, either by detection followed by regression, or by
-learning discriminatively with a counting distance metric
-\cite{lempitsky10count}. 
-In this work we consider the problem of counting jointly with instance
-segmentation.
-This allows the system to automatically determine a stopping criterion
-in the recurrent formulation we pursue here.
+A related problem of interest entails counting the instances of an object class
+in an image. On its own this problem is also of practical value.
+% Mengye: we had listed some applications in an earlier version).
+% Rich: are you referring to the list "autonomous driving, image captioning,
+% and visual question answering" in the Abstract?
+Studies in applications such as image question answering \cite{antol15vqa,
+ren15vqa} also reveal that counting, especially on everyday objects, is a very
+challenging task on its own \cite{chattopadhyay16count}. Counting has been
+formulated in a task-specific setting, either by detection followed by
+regression, or by learning discriminatively with a counting distance metric
+\cite{lempitsky10count}.  In this work we consider the problem of counting
+jointly with instance segmentation. This allows the system to automatically
+determine a stopping criterion in the recurrent formulation we pursue here.
 
-To tackle these challenges, we propose a new model based on a recurrent
-neural network (RNN) that utilizes visual attention, to perform instance
-segmentation.  Our system addresses the dimensionality issue by using a
-temporal chain that outputs a single instance at a time. It also performs
-dynamic NMS, using an object that is already segmented to aid in the discovery
-of an occluded object later in the sequence. Using an RNN to segment one
-instance at a time is also inspired by human-like iterative and attentive
-counting processes. For real-world cluttered scenes, iterative counting with
-attention will likely perform better than a regression model that operates on
-the global image level.
+To tackle these challenges, we propose a new model based on a recurrent neural
+network (RNN) that utilizes visual attention, to perform instance segmentation.
+Our system addresses the dimensionality issue by using a temporal chain that
+outputs a single instance at a time. It also performs dynamic NMS, using an
+object that is already segmented to aid in the discovery of an occluded object
+later in the sequence. Using an RNN to segment one instance at a time is also
+inspired by human-like iterative and attentive counting processes. For
+real-world cluttered scenes, iterative counting with attention will likely
+perform better than a regression model that operates on the global image level.
 
 % \b{\*{Contributions}. We proposed a novel model with recurrent attention
 % dynamics in which we explicitly feed in the output from one time-step to
-% facilitate occlusion reasoning in the next.  We focus on instance segmentation
-% of a single object-type per image and evaluate our model on a number of
-% challenging datasets for instance segmentation: 1) CVPPP leaf segmentation
-% dataset \cite{minervini14cvppp}; 2) KITTI car segmentation dataset
-% \cite{geiger12kitti}; and 3) on MS-COCO \cite{lin14mscoco} images, where we
-% train two different models, on ``person'' and ``zebra'' categories.  We show
-% state-of-the-art performance on both CVPPP and KITTI dataset, and impressive
-% counting ability on MS-COCO. }
+% facilitate occlusion reasoning in the next.  We focus on instance
+% segmentation of a single object-type per image and evaluate our model on a
+% number of challenging datasets for instance segmentation: 1) CVPPP leaf
+% segmentation dataset \cite{minervini14cvppp}; 2) KITTI car segmentation
+% dataset \cite{geiger12kitti}; and 3) on MS-COCO \cite{lin14mscoco} images,
+% where we train two different models, on ``person'' and ``zebra'' categories.
+% We show state-of-the-art performance on both CVPPP and KITTI dataset, and
+% impressive counting ability on MS-COCO. }
