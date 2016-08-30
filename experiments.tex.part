@@ -18,11 +18,11 @@ relative importance of model components via ablation studies:
 \begin{itemize}
 \item \textbf{No box net}. Instead of predicting segmentation within a box, the
 output dimension of the segmentation network is the full image.
-\item \textbf{No pre processing}. This network is trained to take raw image
-pixels, without having foreground/angle map segmentation information.
+\item \textbf{No pre-processing}. This network is trained to take raw image
+pixels, without foreground/angle map segmentation.
 \item \textbf{No scheduled sampling}. This network has the same architecture 
 but trained without scheduled sampling (see Section~\ref{sec:postproc}).
-\item \textbf{No post processing}. The same network but at test time we do not
+\item \textbf{No post-processing}. The same network but at test time we do not
 apply post-processing techniques (see Section~\ref{sec:postproc})
 \end{itemize}
 
