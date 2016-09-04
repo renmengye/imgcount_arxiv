@@ -1,7 +1,7 @@
 \section{Introduction}
 
 Instance segmentation is a fundamental computer vision problem, which aims to
-assign pixel-level instance labelling to a given image.  While the standard
+assign pixel-level instance labeling to a given image.  While the standard
 semantic segmentation problem entails assigning class labels to each pixel in
 an image, it says nothing about the number of instances of each class in the
 image. Instance segmentation is considerably more difficult than semantic
@@ -33,18 +33,19 @@ time-consuming pipeline. Furthermore, these models cannot be trained in an
 end-to-end fashion.
 
 A related problem of interest entails counting the instances of an object class
-in an image. On its own this problem is also of practical value.
-% Mengye: we had listed some applications in an earlier version).
-% Rich: are you referring to the list "autonomous driving, image captioning,
-% and visual question answering" in the Abstract?
-Studies in applications such as image question answering \cite{antol15vqa,
-ren15vqa} also reveal that counting, especially on everyday objects, is a very
-challenging task on its own \cite{chattopadhyay16count}. Counting has been
-formulated in a task-specific setting, either by detection followed by
-regression, or by learning discriminatively with a counting distance metric
-\cite{lempitsky10count}.  In this work we consider the problem of counting
-jointly with instance segmentation. This allows the system to automatically
-determine a stopping criterion in the recurrent formulation we pursue here.
+in an image. On its own this problem is also of practical value. For instance,
+counting provides useful population estimates in medical imaging and aerial
+imaging. General object counting is also core to our basic arithmetic
+intelligence: human beings invented numbers and arithmetics to keep record of
+the count of their belongings. Studies in applications such as image question
+answering \cite{antol15vqa, ren15vqa} also reveal that counting, especially on
+everyday objects, is still a very challenging task on its own
+\cite{chattopadhyay16count}. Counting has been formulated in a task-specific
+setting, either by detection followed by regression, or by learning
+discriminatively with a counting distance metric \cite{lempitsky10count}. In
+this work we consider the problem of counting jointly with instance
+segmentation. This allows the system to automatically determine a stopping
+criterion in the recurrent formulation we pursue here.
 
 To tackle these challenges, we propose a new model based on a recurrent neural
 network (RNN) that utilizes visual attention, to perform instance segmentation.
@@ -55,14 +56,3 @@ later in the sequence. Using an RNN to segment one instance at a time is also
 inspired by human-like iterative and attentive counting processes. For
 real-world cluttered scenes, iterative counting with attention will likely
 perform better than a regression model that operates on the global image level.
-
-% \b{\*{Contributions}. We proposed a novel model with recurrent attention
-% dynamics in which we explicitly feed in the output from one time-step to
-% facilitate occlusion reasoning in the next.  We focus on instance
-% segmentation of a single object-type per image and evaluate our model on a
-% number of challenging datasets for instance segmentation: 1) CVPPP leaf
-% segmentation dataset \cite{minervini14cvppp}; 2) KITTI car segmentation
-% dataset \cite{geiger12kitti}; and 3) on MS-COCO \cite{lin14mscoco} images,
-% where we train two different models, on ``person'' and ``zebra'' categories.
-% We show state-of-the-art performance on both CVPPP and KITTI dataset, and
-% impressive counting ability on MS-COCO. }

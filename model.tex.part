@@ -45,14 +45,13 @@ this foreground mask, as a second component we followed the work of Uhrig et al.
 \cite{uhrig16insseg} by producing an angle map for each object. For each
 foreground pixel, we calculate its relative angle towards the centroid of the
 object, and quantize the angle into 8 different classes, forming 8 channels, as
-shown in Figure~\ref{fig:fcn}. Predicting the angle map forces the model
-to encode more detailed information about object boundaries. The
-architecture and training of these components are detailed in the Appendix.
+shown in Figure~\ref{fig:fcn}. Predicting the angle map forces the model to
+encode more detailed information about object boundaries. The architecture and
+training of these components are detailed in the Appendix.
 % (later) For the plant segmentation experiment we did not find this
 % preprocessing useful and instead we opted for the raw image pixels. 
-We denote $\*{x}_0$ as the original
-image (3 channel RGB), and $\*{x}$ as the preprocessed image (9 channels: 1 for
-foreground and 8 for angles).
+We denote $\*{x}_0$ as the original image (3 channel RGB), and $\*{x}$ as the
+preprocessed image (9 channels: 1 for foreground and 8 for angles).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -127,11 +126,11 @@ locations, and $\tau$ indexes the glimpses.
                     \end{cases}
 \end{align}
 
-We pass the LSTM's hidden state through a linear layer to obtain predicted
-box coordinates. We parameterize the box by its normalized center
-$(g_X,g_Y)$, and size $(\log \delta_X, \log \delta_Y)$. A scaling factor $\gamma$ is
-also predicted by the linear layer, and used when re-projecting the patch
-to the original image size.
+We pass the LSTM's hidden state through a linear layer to obtain predicted box
+coordinates. We parameterize the box by its normalized center $(g_X,g_Y)$, and
+size $(\log \delta_X, \log \delta_Y)$. A scaling factor $\gamma$ is also
+predicted by the linear layer, and used when re-projecting the patch to the
+original image size.
 \begin{align}
 [\tilde{g}_X,
  \tilde{g}_Y 
@@ -173,7 +172,7 @@ F_Y^{b, j}      &= \frac{1}{\sqrt{2\pi} \sigma_Y}
 \begin{align}
 \tilde{\*x}_t   &= [\*{x}_0, \*{d}_t^{\text{canvas}}]                        \\
 \*p_t           &= \texttt{Extract}(\tilde{\*{x}}_t, F_Y, F_X) 
-            \equiv F_Y^T \tilde{\*{x}}_t F_X
+            \equiv F_Y^\top \tilde{\*{x}}_t F_X
 \end{align}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -181,21 +180,17 @@ F_Y^{b, j}      &= \frac{1}{\sqrt{2\pi} \sigma_Y}
 \subsection{Part C: Segmentation network}
 
 The remaining task is to segment out the pixels that belong to the dominant
-object within the window. The segmentation network first utilizes a
-convolution network to produce a feature map $\*v_t$. We then adopt a variant
-of the DeconvNet \cite{noh15deconv} with skip connections, which appends
-deconvolution (or convolution transpose) layers to upsample the low-resolution
-feature map to a full-size segmentation. After the fully convolutional layers
-% Mengye - should this be "fully de-convolutional"? 
-% Rich - de-convolution here is still doing convolution (same operator, just
-% transpose the filters. Stride 2 in regular convolution becomes stride 1/2 in
-% deconvolution).
-we get a patch-level segmentation prediction heat map $\tilde{y}_t$. We then
-re-project this patch prediction to the original image using the transpose of
-the previously computed Gaussian filters; the learned $\gamma$ magnifies the
-signal within the bounding box, and a constant $\beta$ suppresses the pixels
-outside the box. Applying the sigmoid function produces final segmentation
-values between 0 and 1.
+object within the window. The segmentation network first utilizes a convolution
+network to produce a feature map $\*v_t$. We then adopt a variant of the
+DeconvNet \cite{noh15deconv} with skip connections, which appends deconvolution
+(or convolution transpose) layers to upsample the low-resolution feature map to
+a full-size segmentation. After the fully convolutional layers we get a
+patch-level segmentation prediction heat map $\tilde{y}_t$. We then re-project
+this patch prediction to the original image using the transpose of the
+previously computed Gaussian filters; the learned $\gamma$ magnifies the signal
+within the bounding box, and a constant $\beta$ suppresses the pixels outside
+the box. Applying the sigmoid function produces final segmentation values
+between 0 and 1.
 \begin{align}
 \*v_t         &= \texttt{CNN}(\*p_t)                                         \\
 \tilde{\*y}_t &= \texttt{D-CNN}(\*v_t)                                       \\
@@ -211,8 +206,8 @@ values between 0 and 1.
 To estimate the number of objects in the image, and to terminate our sequential
 process, we incorporate a scoring network, similar to the one presented in
 \cite{romeraparedes15ris}. Our scoring network takes information from the
-hidden states of both the box network ($z_t$) and segmentation network ($v_t$) to
-produce a score between 0 and 1.
+hidden states of both the box network ($z_t$) and segmentation network ($v_t$)
+to produce a score between 0 and 1.
 \begin{equation}
 s_{t} = \texttt{sigmoid}(\*w_{zs}^\top\*z_{t, \text{end}} + 
                          \*w_{vs}^\top\*v_t + \*{w}_{s0})
@@ -239,7 +234,7 @@ $\mathcal{L}_b$; and the score cross-entropy loss $\mathcal{L}_s$:
 \textbf{(a) Matching IoU loss (mIOU)}. A primary challenge of instance
 segmentation involves matching model and ground-truth instances.  we compute a
 maximum-weighted  bipartite graph matching between the output instances and
-ground-truth instances (c.f., \cite{stewart15lstmdet} and 
+ground-truth instances (c.f., \cite{stewart15lstmdet} and
 \cite{romeraparedes15ris}).
 Matching makes the loss insensitive to the ordering of the ground-truth
 instances. Unlike coverage scores proposed in \cite{silberman14insseg} it
@@ -267,7 +262,7 @@ box that is  scaled proportionally in both height and width.
 \begin{align}
 \*b_{t}                   &= \texttt{sigmoid}(\gamma \cdot
                              \texttt{Extract}(
-                             \mathbf{1}, F_Y^T, F_X^T) - \beta)              \\
+                             \mathbf{1}, F_Y^\top, F_X^\top) - \beta)        \\
 \mathcal{L}_b(\*b, \*b^*) &= -\texttt{mIOU}(\*b, \texttt{Pad}(\*b^*))
 \end{align}
 

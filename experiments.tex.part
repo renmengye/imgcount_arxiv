@@ -4,7 +4,7 @@
 CVPPP plant leaf dataset \cite{minervini14cvppp}, which was developed due to
 the importance of instance segmentation in plant phenotyping. We ran the A1
 subset of CVPPP plant leaf segmentation dataset. We trained our model on 128
-labelled images, and report results on the 33 test images. We compare our
+labeled images, and report results on the 33 test images. We compare our
 performance to \cite{romeraparedes15ris}, and other top approaches that were
 published with the CVPPP conference; see the collation study
 \cite{scharr16leaf} for details of these  other approaches.
@@ -13,8 +13,16 @@ published with the CVPPP conference; see the collation study
 information in the context of autonomous driving. Following
 \cite{zhang15insseg, zhang16insseg, uhrig16insseg}, we also evaluated the model
 performance on KITTI car segmentation dataset. We trained the model with 3712
-training images, and report performance on 144 test images. We also examine the
-relative importance of model components via ablation studies:
+training images, and report performance on 144 test images. 
+
+\textbf{MS-COCO images}. Additionally, we train class specific models on MS-
+COCO and test counting performance on the results. We chose ``person'' and
+``zebra'' because these are the two of the most common classes in VQA counting
+questions. We report counting performance on images with at least one instance
+of the class: 677 zebra images, and 21,634 ``person'' images.
+
+\textbf{Ablation studies}. We also examine the relative importance of model
+components via ablation studies:
 \begin{itemize}
 \item \textbf{No box net}. Instead of predicting segmentation within a box, the
 output dimension of the segmentation network is the full image.
@@ -25,12 +33,6 @@ but trained without scheduled sampling (see Section~\ref{sec:postproc}).
 \item \textbf{No post-processing}. The same network but at test time we do not
 apply post-processing techniques (see Section~\ref{sec:postproc})
 \end{itemize}
-
-\textbf{MS-COCO counting}. Additionally, we train class specific models on MS-
-COCO and test counting performance on the results. We chose ``person'' and
-``zebra'' because these are the two of the most common classes in VQA
-questions. We report counting performance on images with at least one instance
-of the class: 677 zebra images, and 21,634 ``person'' images.
 
 \input{tabs/cvppp_table.tex.part}
 \input{figs/cvppp_fig.tex.part}
@@ -91,22 +93,21 @@ plays a crucial role (omitting this leads to a steep performance drop); this
 likely helps segment smaller objects, whereas our box network does not reliably
 detect distant cars.
 
-In the zebra counting task, we found that our model outperforms the detector
-and NMS method, and associative-subitizing methods~\cite{chattopadhyay16count},
-but we are not doing as well in the person category. However, relative to these
-regression-based methods, our model permits insight into the recognition of
-each instance by inspecting the output segmentation. Figure~\ref{fig:count}
-shows the relation between counting performance and number of instances. Mean
-absolute difference in count is around 1 for up to 18 leaves, 7 cars, 7 zebras
-and 3 people.
+In MS-COCO images, we found that our model outperforms the detector and NMS
+method, and associative-subitizing methods~\cite{chattopadhyay16count} in the
+zebra category, but not as well in the person category. However, relative to
+these regression-based methods, our model permits insight into the recognition
+of each instance by inspecting the output segmentation. Note that since our
+model is not trained to directly output the total count, but instead jointly
+with pixel- based loss function, it might give larger overall errors due to the
+model bias.
 
-In Figure \ref{fig:count}, instead of having a linear relation between counting
-error and groundtruth count, as appeared in most regression based model, our
-model is making much less errors in the low count regime in all four datasets,
-reflecting the nature of our iterative counting method, which delivers higher
-counting accuracy for small number of objects. Note that since our model is not
-trained to directly output the total count, but instead jointly with pixel-
-based loss function, it might give larger overall errors due to the model bias.
+We obtain further insights of the counting task by examining Figure
+\ref{fig:count} on the relation of counting error and the groundtruth count.
+Instead of having a linear relation between the two, as appeared in most
+regression based model, our model is making much less errors in the low count
+regime in all four datasets, reflecting the nature of our iterative counting
+method, which delivers higher counting accuracy for small number of objects.
 
 From Figures \ref{fig:cvppp_out}, \ref{fig:kitti_out},
 \ref{fig:coco_person_out}, \ref{fig:coco_zebra_out} we see our model is
