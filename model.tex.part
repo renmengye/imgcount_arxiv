@@ -297,7 +297,7 @@ gradually remove the reliance on ground-truth segmentation at the input of the
 network. As shown in Figure~\ref{fig:model_arch}, during training there is a
 dynamic switch ($\theta_t$) in the input of the external memory, to utilize either the
 maximally overlapping ground-truth instance segmentation, or the  output of the
-network from the previous time step. By the end of the training, the model is
+network from the previous time step. By the end of the training, the model
 completely relies on its own output from the previous step,  which 
 matches the test-time inference procedure.
 
