@@ -34,11 +34,6 @@ but trained without scheduled sampling (see Section~\ref{sec:postproc}).
 apply post-processing techniques (see Section~\ref{sec:postproc})
 \end{itemize}
 
-\input{tabs/cvppp_table.tex.part}
-\input{figs/cvppp_fig.tex.part}
-
-\input{tabs/kitti_table.tex.part}
-\input{figs/kitti_fig.tex.part}
 
 \textbf{Evaluation metrics}. We evaluate based on the  metrics used by the other studies
 in the respective benchmarks: symmetric best dice (SBD) for leaf segmentation
@@ -75,6 +70,12 @@ number of  ground-truth instances that do not overlap with the prediction.
 \label{eq:dic}
 \texttt{|DiC|} = \frac{1}{N}\sum_i |count_i - count_i^*|
 \end{align}
+
+\input{tabs/cvppp_table.tex.part}
+\input{figs/cvppp_fig.tex.part}
+
+\input{tabs/kitti_table.tex.part}
+\input{figs/kitti_fig.tex.part}
 
 \subsection{Results \& Discussion}
 
@@ -130,8 +131,8 @@ regime in all four datasets, reflecting the nature of our iterative counting
 method. This is arguably preferable, as errors in smaller counts are likely
 more significant.
 
-Finally, our ablation studies help elucidate the contribution of some
-model components.
+Finally, our ablation studies (see Table~\ref{tab: })
+help elucidate the contribution of some model components.
 We found that using scheduled sampling results in much better performance. It
 helps by making training resemble testing, gradually forcing the model to carry
 out a full sequence during training instead of relying on ground-truth input.
