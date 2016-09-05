@@ -26,8 +26,8 @@ components via ablation studies:
 \begin{itemize}
 \item \textbf{No box net}. Instead of predicting segmentation within a box, the
 output dimension of the segmentation network is the full image.
-\item \textbf{No pre-processing}. This network is trained to take raw image
-pixels, without foreground/angle map segmentation.
+\item \textbf{No pre-processing}. This network is trained to take as input raw image
+pixels, without the foreground segmentation or the angle map.
 \item \textbf{No scheduled sampling}. This network has the same architecture 
 but trained without scheduled sampling (see Section~\ref{sec:postproc}).
 \item \textbf{No post-processing}. The same network but at test time we do not
@@ -36,11 +36,11 @@ apply post-processing techniques (see Section~\ref{sec:postproc})
 
 \input{tabs/cvppp_table.tex.part}
 \input{figs/cvppp_fig.tex.part}
+
 \input{tabs/kitti_table.tex.part}
 \input{figs/kitti_fig.tex.part}
-\input{count_fig.tex.part}
 
-\textbf{Evaluation metrics}. We report the  metrics used by the other studies
+\textbf{Evaluation metrics}. We evaluate based on the  metrics used by the other studies
 in the respective benchmarks: symmetric best dice (SBD) for leaf segmentation
 (see Equations~\ref{eq:bd}, \ref{eq:sbd}) and mean (weighted) coverage (MWCov,
 MUCov) for car segmentation (see Equations~\ref{eq:mwcov}, \ref{eq:mucov}). The
@@ -76,16 +76,20 @@ number of  ground-truth instances that do not overlap with the prediction.
 \texttt{|DiC|} = \frac{1}{N}\sum_i |count_i - count_i^*|
 \end{align}
 
-\subsection{Results \& discussion}
+\subsection{Results \& Discussion}
 In the leaf segmentation task, our best model outperforms the previous 
-state-of-the-art by a large margin in both segmentation and counting.
-Table~\ref{tab:cvppp} shows that the models with FCN overfit and 
-scores lower than the simpler version. This is sensible as the dataset size
-is small, and including the FCN significantly increases the input dimension and
+state-of-the-art by a large margin in both segmentation and counting
+(see Table~\ref{tab:cvppp}).
+We found that the models with FCN overfit on this task, and we thus
+utilized the simpler version without input pre-processing.
+This is not surprising, as the dataset 
+is very small, and including the FCN significantly increases the input dimension and
 number of parameters.
 
-In the car segmentation task, our model achieves the state-of-the-art MWCov
-shown in Table~\ref{tab:kitti}, but our MUCov is lower than results reported by
+In the car segmentation task, our model achieves the state-of-the-art 
+results (see  Table~\ref{tab:kitti}) across several of the relevant measures,
+including IoU, weighted coverage, and false positives.
+Note however that our MUCov is lower than results reported by
 Uhrig et al. \cite{uhrig16insseg}. One possible explanation is their inclusion
 of depth information during training, which may help the model disambiguate
 distant object boundaries. Moreover, their bottom-up ``instance fusion'' method
@@ -93,21 +97,7 @@ plays a crucial role (omitting this leads to a steep performance drop); this
 likely helps segment smaller objects, whereas our box network does not reliably
 detect distant cars.
 
-In MS-COCO images, we found that our model outperforms the detector and NMS
-method, and associative-subitizing methods~\cite{chattopadhyay16count} in the
-zebra category, but not as well in the person category. However, relative to
-these regression-based methods, our model permits insight into the recognition
-of each instance by inspecting the output segmentation. Note that since our
-model is not trained to directly output the total count, but instead jointly
-with pixel- based loss function, it might give larger overall errors due to the
-model bias.
-
-We obtain further insights of the counting task by examining Figure
-\ref{fig:count} on the relation of counting error and the groundtruth count.
-Instead of having a linear relation between the two, as appeared in most
-regression based model, our model is making much less errors in the low count
-regime in all four datasets, reflecting the nature of our iterative counting
-method, which delivers higher counting accuracy for small number of objects.
+In MS-COCO images, 
 
 From Figures \ref{fig:cvppp_out}, \ref{fig:kitti_out},
 \ref{fig:coco_person_out}, \ref{fig:coco_zebra_out} we see our model is
@@ -117,12 +107,36 @@ segments the more salient objects and then accounts for the occluded instances.
 In addition, our segmentation network can handle a range of object sizes
 because of the design of the box network.
 
+With respect to the counting task,
+Table \ref{tab:coco-count} shows
+that our model outperforms the detector and NMS
+method, and associative-subitizing methods~\cite{chattopadhyay16count} in the
+zebra category, but not as well in the person category. It is not surprising
+that a method trained directly to estimate the number of objects can
+out-perform our model, which 
+is trained to optimize the segmentation rather than the total count.
+However, relative to
+these regression-based methods, our model permits insight into the recognition
+of each instance by inspecting the output segmentation. 
+
+We obtain further insight into the counting task by examining Figure
+\ref{fig:count} on the relation of counting error and the ground-truth count.
+Instead of having a linear relation between the two, as is common in
+regression-based models, our model is making many fewer errors in the low count
+regime in all four datasets, reflecting the nature of our iterative counting
+method.
+This is arguably preferable, as errors in smaller counts are likely more
+significant.
+
+Finally, our ablation studies help elucidate the contribution of some
+model components.
 We found that using scheduled sampling results in much better performance. It
 helps by making training resemble testing, gradually forcing the model to carry
 out a full sequence during training instead of relying on ground-truth input.
-Finally, the convolutional and attentional architecture significantly reduces
+Also, the convolutional and attentional architecture significantly reduces
 the number of parameters (around 9M) and the performance is quite strong
 despite being trained with only 100 leaf images and 1000 zebra images.
 
 \input{figs/coco_person_fig.tex.part}
 \input{figs/coco_zebra_fig.tex.part}
+\input{count_fig.tex.part}

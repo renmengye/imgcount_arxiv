@@ -35,11 +35,13 @@ end-to-end fashion.
 A related problem of interest entails counting the instances of an object class
 in an image. On its own this problem is also of practical value. For instance,
 counting provides useful population estimates in medical imaging and aerial
-imaging. General object counting is also core to our basic arithmetic
-intelligence: human beings invented numbers and arithmetics to keep record of
-the count of their belongings. Studies in applications such as image question
-answering \cite{antol15vqa, ren15vqa} also reveal that counting, especially on
-everyday objects, is still a very challenging task on its own
+imaging. General object counting is fundamental to image understanding,
+and our basic arithmetic intelligence.
+%: human beings invented numbers and arithmetics to keep record of
+%the count of their belongings. 
+Studies in applications such as image question
+answering \cite{antol15vqa, ren15vqa} reveal that counting, especially on
+everyday objects, is a very challenging task on its own
 \cite{chattopadhyay16count}. Counting has been formulated in a task-specific
 setting, either by detection followed by regression, or by learning
 discriminatively with a counting distance metric \cite{lempitsky10count}. In
