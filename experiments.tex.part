@@ -78,18 +78,15 @@ number of  ground-truth instances that do not overlap with the prediction.
 
 \subsection{Results \& Discussion}
 
-Example results on the leaf segmentation task are shown in 
-Figure \ref{fig:cvppp_out}.
-On this task, our best model outperforms the previous 
-state-of-the-art by a large margin in both segmentation and counting
-(see Table~\ref{tab:cvppp}).
-We found that the models with FCN overfit on this task, and we thus
-utilized the simpler version without input pre-processing.
-This is not surprising, as the dataset 
-is very small, and including the FCN significantly increases the input dimension and
-number of parameters.
+Example results on the leaf segmentation task are shown in
+Figure~\ref{fig:cvppp_out}. On this task, our best model outperforms the
+previous state-of-the-art by a large margin in both segmentation and counting
+(see Table~\ref{tab:cvppp}). We found that the models with FCN overfit on this
+task, and we thus utilized the simpler version without input pre-processing.
+This is not surprising, as the dataset is very small, and including the FCN
+significantly increases the input dimension and number of parameters.
 
-In the KITTI task, Figure \ref{fig:kitti_out} shows that our
+In the KITTI task, Figure~\ref{fig:kitti_out} shows that our
 model can segment cars in a wide variety of poses. It achieves state-of-the-art 
 results (see  Table~\ref{tab:kitti}) across several of the relevant measures,
 including IoU, weighted coverage, and false positives.
@@ -102,38 +99,36 @@ likely helps segment smaller objects, whereas our box network does not reliably
 detect distant cars.
 
 In MS-COCO images, our model is able to learn to segment instances of the two
-specific classes, zebra and humans, in some challenging instances.
-In Figures \ref{fig:coco_person_out}, \ref{fig:coco_zebra_out} we see that our model is
-handling a significant amount of object occlusion and truncation. We verified
-that the external memory helps with the counting process as the network first
-segments the more salient objects and then accounts for the occluded instances.
-In addition, our segmentation network can handle a range of object sizes
-because of the design of the box network.
+specific classes, zebra and humans, in some challenging instances. In
+Figures~\ref{fig:coco_person_out}, \ref{fig:coco_zebra_out} we see that our
+model is handling a significant amount of object occlusion and truncation. We
+verified that the external memory helps with the counting process as the
+network first segments the more salient objects and then accounts for the
+occluded instances. In addition, our segmentation network can handle a range of
+object sizes because of the design of the box network.
 
-With respect to the counting task,
-Table \ref{tab:coco-count} shows
-that our model outperforms the detector and NMS
-method, and associative-subitizing methods~\cite{chattopadhyay16count} in the
-zebra category, but not as well in the person category. It is not surprising
-that a method trained directly to estimate the number of objects can
-out-perform our model, which 
-is trained to optimize the segmentation rather than the total count.
-However, relative to
+With respect to the counting task, Table~\ref{tab:coco-count} shows that our
+model outperforms the detector and NMS method, and associative-subitizing
+methods~\cite{chattopadhyay16count} in the zebra category, but not as well in
+the person category. It is not surprising that a method trained directly to
+estimate the number of objects can out-perform our model, which is trained to
+optimize the segmentation rather than the total count. However, relative to
 these regression-based methods, our model permits insight into the recognition
-of each instance by inspecting the output segmentation. 
+of each instance by inspecting the output segmentation.
 
 \input{figs/coco_person_fig.tex.part}
 \input{figs/coco_zebra_fig.tex.part}
+\input{tabs/coco_count_table.tex.part}
+\input{tabs/kitti_ablation_table.tex.part}
 \input{count_fig.tex.part}
 
-We obtain further insight into the counting task by examining Figure
-\ref{fig:count} on the relation of counting error and the ground-truth count.
-Instead of having a linear relation between the two, as is common in
+We obtain further insight into the counting task by examining
+Figure~\ref{fig:count} on the relation of counting error and the ground-truth
+count. Instead of having a linear relation between the two, as is common in
 regression-based models, our model is making many fewer errors in the low count
 regime in all four datasets, reflecting the nature of our iterative counting
-method.
-This is arguably preferable, as errors in smaller counts are likely more
-significant.
+method. This is arguably preferable, as errors in smaller counts are likely
+more significant.
 
 Finally, our ablation studies help elucidate the contribution of some
 model components.
