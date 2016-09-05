@@ -295,11 +295,11 @@ predicted values.
 explore the idea of ``scheduled sampling'' \cite{bengio15schedsamp} where we
 gradually remove the reliance on ground-truth segmentation at the input of the
 network. As shown in Figure~\ref{fig:model_arch}, during training there is a
-dynamic switch in the input of the external memory, to utilize either the
+dynamic switch ($\theta_t$) in the input of the external memory, to utilize either the
 maximally overlapping ground-truth instance segmentation, or the  output of the
 network from the previous time step. By the end of the training, the model is
-completely fed with its own output from the previous step,  which is the
-same as running inference.
+completely relies on its own output from the previous step,  which 
+matches the test-time inference procedure.
 
 \textbf{Post-processing}. We truncate segmentation outside the predicted
 foreground mask, fill holes with the labels from the nearest neighboring

@@ -77,7 +77,10 @@ number of  ground-truth instances that do not overlap with the prediction.
 \end{align}
 
 \subsection{Results \& Discussion}
-In the leaf segmentation task, our best model outperforms the previous 
+
+Example results on the leaf segmentation task are shown in 
+Figure \ref{fig:cvppp_out}.
+On this task, our best model outperforms the previous 
 state-of-the-art by a large margin in both segmentation and counting
 (see Table~\ref{tab:cvppp}).
 We found that the models with FCN overfit on this task, and we thus
@@ -86,7 +89,8 @@ This is not surprising, as the dataset
 is very small, and including the FCN significantly increases the input dimension and
 number of parameters.
 
-In the car segmentation task, our model achieves the state-of-the-art 
+In the KITTI task, Figure \ref{fig:kitti_out} shows that our
+model can segment cars in a wide variety of poses. It achieves state-of-the-art 
 results (see  Table~\ref{tab:kitti}) across several of the relevant measures,
 including IoU, weighted coverage, and false positives.
 Note however that our MUCov is lower than results reported by
@@ -97,10 +101,9 @@ plays a crucial role (omitting this leads to a steep performance drop); this
 likely helps segment smaller objects, whereas our box network does not reliably
 detect distant cars.
 
-In MS-COCO images, 
-
-From Figures \ref{fig:cvppp_out}, \ref{fig:kitti_out},
-\ref{fig:coco_person_out}, \ref{fig:coco_zebra_out} we see our model is
+In MS-COCO images, our model is able to learn to segment instances of the two
+specific classes, zebra and humans, in some challenging instances.
+In Figures \ref{fig:coco_person_out}, \ref{fig:coco_zebra_out} we see that our model is
 handling a significant amount of object occlusion and truncation. We verified
 that the external memory helps with the counting process as the network first
 segments the more salient objects and then accounts for the occluded instances.
@@ -119,6 +122,10 @@ However, relative to
 these regression-based methods, our model permits insight into the recognition
 of each instance by inspecting the output segmentation. 
 
+\input{figs/coco_person_fig.tex.part}
+\input{figs/coco_zebra_fig.tex.part}
+\input{count_fig.tex.part}
+
 We obtain further insight into the counting task by examining Figure
 \ref{fig:count} on the relation of counting error and the ground-truth count.
 Instead of having a linear relation between the two, as is common in
@@ -136,7 +143,3 @@ out a full sequence during training instead of relying on ground-truth input.
 Also, the convolutional and attentional architecture significantly reduces
 the number of parameters (around 9M) and the performance is quite strong
 despite being trained with only 100 leaf images and 1000 zebra images.
-
-\input{figs/coco_person_fig.tex.part}
-\input{figs/coco_zebra_fig.tex.part}
-\input{count_fig.tex.part}
