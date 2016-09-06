@@ -19,23 +19,24 @@ $t$ indexes the iterations of the model, and
 $\tau$ indexes the glimpses of the box network's inner RNN;
 $\*y   = \{\*{y}_t | \*{y}_t \in (0, 1)^{H \times W}\}_{t=1}^T$,
 $\*y^* = \{\*{y}^*_t | \*{y}^*_t \in \{0, 1\}^{H \times W}\}_{t=1}^T$
-is the output/ground-truth segmentation sequence;
+are the output/ground-truth segmentation sequences;
 $\*s   = \{s_{t} | s_t \in (0, 1)\}_{t=1}^{T}$, 
 $\*s^* = \{s^*_{t} | s^*_{t} \in \{0, 1\}\}_{t=1}^{T}$ 
-is the output/ground-truth confidence score sequence.
-$h = \texttt{CNN}(I)$
+are the output/ground-truth confidence score sequences.
+$\*h = \texttt{CNN}(I)$
 denotes passing an image $I$ through a CNN and returning the hidden activation
-$h$. 
-$I' = \texttt{D-CNN}(h)$
+$\*h$. 
+$I' = \texttt{D-CNN}(\*h)$
 denotes passing an activation map $h$ through a de-convolutional network
 (D-CNN) and returning an image $I'$.
-$h_t = \texttt{LSTM}(h_{t-1}, x_t)$ or $\texttt{ConvLSTM}(h_{t-1}, x_t)$
+$\*h_t = \texttt{LSTM}(\*h_{t-1}, \*x_t)$ or 
+$\texttt{ConvLSTM}(\*h_{t-1}, \*x_t)$
 denotes unrolling the long short-term memory (LSTM) or convolutional LSTM
-(ConvLSTM) by one time-step with the previous hidden state $h_{t-1}$ and
-current input $x_t$, and returning the current hidden state $h_t$.
-$h = \texttt{MLP}(x)$
-denotes passing an input $x$ through a multi-layer perceptron (MLP) and
-returning the hidden state $h$.
+(ConvLSTM) by one time-step with the previous hidden state $\*h_{t-1}$ and
+current input $\*x_t$, and returning the current hidden state $\*h_t$.
+$\*h = \texttt{MLP}(\*x)$
+denotes passing an input $\*x$ through a multi-layer perceptron (MLP) and
+returning the hidden state $\*h$.
 
 \textbf{Input preprocessing}. We pretrain a FCN \cite{long15fcn} to perform
 input preprocessing. This pretrained FCN has two output components. The first is
@@ -127,10 +128,10 @@ locations, and $\tau$ indexes the glimpses.
 \end{align}
 
 We pass the LSTM's hidden state through a linear layer to obtain predicted box
-coordinates. We parameterize the box by its normalized center $(g_X,g_Y)$, and
-size $(\log \delta_X, \log \delta_Y)$. A scaling factor $\gamma$ is also
-predicted by the linear layer, and used when re-projecting the patch to the
-original image size.
+coordinates. We parameterize the box by its normalized center
+$(\tilde{g}_X,\tilde{g}_Y)$, and size $(\log \tilde{\delta}_X, \log
+\tilde{\delta}_Y)$. A scaling factor $\gamma$ is also predicted by the linear
+layer, and used when re-projecting the patch to the original image size.
 \begin{align}
 [\tilde{g}_X,
  \tilde{g}_Y 

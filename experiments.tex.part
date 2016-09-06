@@ -131,11 +131,11 @@ regime in all four datasets, reflecting the nature of our iterative counting
 method. This is arguably preferable, as errors in smaller counts are likely
 more significant.
 
-Finally, our ablation studies (see Table~\ref{tab: })
-help elucidate the contribution of some model components.
-We found that using scheduled sampling results in much better performance. It
-helps by making training resemble testing, gradually forcing the model to carry
-out a full sequence during training instead of relying on ground-truth input.
-Also, the convolutional and attentional architecture significantly reduces
-the number of parameters (around 9M) and the performance is quite strong
-despite being trained with only 100 leaf images and 1000 zebra images.
+Finally, our ablation studies (see Table~\ref{tab:kitti-ablation}) help
+elucidate the contribution of some model components. We found that using
+scheduled sampling results in much better performance. It helps by making
+training resemble testing, gradually forcing the model to carry out a full
+sequence during training instead of relying on ground-truth input. Also, the
+convolutional and attentional architecture significantly reduces the number of
+parameters (around 9M) and the performance is quite strong despite being
+trained with only 100 leaf images and 1000 zebra images.
