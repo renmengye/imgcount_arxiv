@@ -1,0 +1,39 @@
+\newcommand{\APfif}{AP$^{\text{50\%}}$}
+\newcommand{\APfifm}{AP$^{\text{50m}}$}
+\newcommand{\APhunm}{AP$^{\text{100m}}$}
+\begin{table}[t]
+\begin{minipage}[t]{\columnwidth}
+\caption{Cityscapes instance-level segmentation results}
+\label{tab:city}
+\centering
+\begin{small}
+% Resize box start
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{l|l|llll}
+\toprule
+\toprule
+                     &  Set  & AP       & \APfif    & \APfifm   & \APhunm    \\
+\midrule
+
+MCG+RCNN                                                                       
+\cite{cordts16cityscapes}                                                      
+                     &  all  & 4.6      & 12.9      & 7.7       & 10.3       \\
+AngleFCN+Depth                                                            
+\cite{uhrig16insseg} &  all  & 8.9      & \*{21.1}  & 15.3      & 16.7       \\
+\midrule                                                                       
+Ours                 &  all  & \*{9.5}  & 18.9      & \*{16.8}  & \*{20.9}   \\
+\midrule                                                                       
+MCG+RCNN                                                                       
+\cite{cordts16cityscapes}                                                      
+                     &  car  & 10.5     & 26.0      & 17.5      & 21.2       \\
+AngleFCN+Depth                                                                 
+\cite{uhrig16insseg} &  car  & 22.5     & 37.8      & 36.4      & 40.7       \\
+\midrule                                                                       
+Ours                 &  car  & \*{27.5} & \*{41.9}  & \*{46.8}  & \*{54.2}   \\
+\bottomrule
+\end{tabular}
+}
+% Resize box end
+\end{small}
+\end{minipage}
+\end{table}

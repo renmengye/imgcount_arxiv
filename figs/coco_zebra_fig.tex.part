@@ -7,17 +7,18 @@
 \includegraphics[width=0.15\textwidth, height=0.22\textwidth]{./figs/coco_zebra_gt/#1.png} &
 \includegraphics[width=0.15\textwidth, height=0.22\textwidth]{./figs/coco_zebra_out/#1.png}}
 
-\begin{figure}
+\begin{figure*}
 \centering
 \begin{small}
-\resizebox{\columnwidth}{!}{
+\resizebox{\textwidth}{!}{
 \begin{tabular}{ccccccc}
 Image & GT & Ours & & Image & GT & Ours \\
-\cocoZebraImgH{000000358555} & & \cocoZebraImgH{000000014820} \\
-\cocoZebraImgV{000000393805} & & \cocoZebraImgV{000000070158} \\
+\cocoZebraImgH{000000231942} & & \cocoZebraImgH{000000464737} \\
+% \cocoZebraImgH{000000358555} & & \cocoZebraImgH{000000014820} \\
+% \cocoZebraImgV{000000393805} & & \cocoZebraImgV{000000070158} \\
 \end{tabular}
 }
 \caption{Examples of our instance segmentation output on MS-COCO zebra images.}
 \label{fig:coco_zebra_out}
 \end{small}
-\end{figure}
+\end{figure*}

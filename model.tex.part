@@ -17,42 +17,43 @@ is the input image
 ($H$, $W$ denotes the dimension, and $C$ denotes the color channel);
 $t$ indexes the iterations of the model, and 
 $\tau$ indexes the glimpses of the box network's inner RNN;
-$\*y   = \{\*{y}_t | \*{y}_t \in (0, 1)^{H \times W}\}_{t=1}^T$,
+$\*y   = \{\*{y}_t | \*{y}_t \in [0, 1]^{H \times W}\}_{t=1}^T$,
 $\*y^* = \{\*{y}^*_t | \*{y}^*_t \in \{0, 1\}^{H \times W}\}_{t=1}^T$
-is the output/ground-truth segmentation sequence;
-$\*s   = \{s_{t} | s_t \in (0, 1)\}_{t=1}^{T}$, 
+are the output/ground-truth segmentation sequences;
+$\*s   = \{s_{t} | s_t \in [0, 1]\}_{t=1}^{T}$, 
 $\*s^* = \{s^*_{t} | s^*_{t} \in \{0, 1\}\}_{t=1}^{T}$ 
-is the output/ground-truth confidence score sequence.
-$h = \texttt{CNN}(I)$
+are the output/ground-truth confidence score sequences.
+$\*h = \text{CNN}(I)$
 denotes passing an image $I$ through a CNN and returning the hidden activation
-$h$. 
-$I' = \texttt{D-CNN}(h)$
+$\*h$. 
+$I' = \text{D-CNN}(\*h)$
 denotes passing an activation map $h$ through a de-convolutional network
 (D-CNN) and returning an image $I'$.
-$h_t = \texttt{LSTM}(h_{t-1}, x_t)$ or $\texttt{ConvLSTM}(h_{t-1}, x_t)$
-denotes unrolling the long short-term memory (LSTM) or convolutional LSTM
-(ConvLSTM) by one time-step with the previous hidden state $h_{t-1}$ and
-current input $x_t$, and returning the current hidden state $h_t$.
-$h = \texttt{MLP}(x)$
-denotes passing an input $x$ through a multi-layer perceptron (MLP) and
-returning the hidden state $h$.
+$\*h_t = \text{LSTM}(\*h_{t-1}, \*x_t)$ 
+% or $\text{ConvLSTM}(\*h_{t-1}, \*x_t)$
+denotes unrolling the long short-term memory (LSTM) 
+% or convolutional LSTM (ConvLSTM) 
+by one time-step with the previous hidden state $\*h_{t-1}$ and
+current input $\*x_t$, and returning the current hidden state $\*h_t$.
+$\*h = \text{MLP}(\*x)$
+denotes passing an input $\*x$ through a multi-layer perceptron (MLP) and
+returning the hidden state $\*h$.
 
-\textbf{Input preprocessing}. We pretrain a FCN \cite{long15fcn} to perform
-input preprocessing. This pretrained FCN has two output components. The first is
+\textbf{Input pre-processing}. We pre-train a FCN \cite{long15fcn} to perform
+input pre-processing. This pre-trained FCN has two output components. The first is
 a 1-channel pixel-level foreground segmentation, produced by a variant of the
 DeconvNet \cite{noh15deconv} with skip connections. In addition to predicting
 this foreground mask, as a second component we followed the work of Uhrig et al.
 \cite{uhrig16insseg} by producing an angle map for each object. For each
 foreground pixel, we calculate its relative angle towards the centroid of the
 object, and quantize the angle into 8 different classes, forming 8 channels, as
-shown in Figure~\ref{fig:fcn}. Predicting the angle map forces the model
-to encode more detailed information about object boundaries. The
-architecture and training of these components are detailed in the Appendix.
+shown in Figure~\ref{fig:fcn}. Predicting the angle map forces the model to
+encode more detailed information about object boundaries. The architecture and
+training of these components are detailed in the Supplementary Material.
 % (later) For the plant segmentation experiment we did not find this
 % preprocessing useful and instead we opted for the raw image pixels. 
-We denote $\*{x}_0$ as the original
-image (3 channel RGB), and $\*{x}$ as the preprocessed image (9 channels: 1 for
-foreground and 8 for angles).
+We denote $\*{x}_0$ as the original image (3 channel RGB), and $\*{x}$ as the
+pre-processed image (9 channels: 1 for foreground and 8 for angles).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -60,13 +61,14 @@ foreground and 8 for angles).
 \input{figs/fcn_fig.tex.part}
 To decide where to look next based on the already segmented objects, we
 incorporate an \*{external memory}, which provides object boundary details from
-all previous steps. We explore two alternative formulations of this memory: 1)
-a \textbf{cumulative canvas} that stores the full history of segmentation
-outputs, and 2) a \textbf {convolutional-RNN} with extra parameters to
-dynamically adapt memory storage. Both operate at the full input resolution to
-precisely deal with occlusion.
-
-1. \textbf{\textit{Cumulative canvas}}. We hypothesize that providing
+all previous steps. 
+% We explore two alternative formulations of this memory: 1)
+% a \textbf{cumulative canvas} that stores the full history of segmentation
+% outputs, and 2) a \textbf {convolutional-RNN} with extra parameters to
+% dynamically adapt memory storage. Both operate at the full input resolution to
+% precisely deal with occlusion.
+% 1. \textbf{\textit{Cumulative canvas}}. 
+We hypothesize that providing
 information of the completed segmentation helps the network reason about
 occluded objects and determine the next region of interest. The canvas has 10
 channels in total: the first channel of the canvas keeps adding new pixels from
@@ -78,35 +80,37 @@ input image.
                                 \max(\*{c}_{t-1}, 
                                 \*{y}_{t-1}),       & \text{otherwise}
                            \end{cases}                                       \\
-&\*{d}_t^{\text{canvas}} = \left[\*{c}_{t}, \*{x}\right]
+% &\*{d}_t^{\text{canvas}} = \left[\*{c}_{t}, \*{x}\right]
+&\*{d}_t = \left[\*{c}_{t}, \*{x}\right]
 \end{align}
 
-2. \textbf{\textit{Convolutional LSTM}}. One issue of the cumulative canvas is
-that the recurrent connection from the output of the previous time step into
-the canvas sometimes leads to training instability. In practice, we observe
-that reducing the gradient flowing back from the input of the canvas aids
-training. An alternative is to learn the ``addition'' operation with another
-RNN. Convolutional Long Short-Term Memory (ConvLSTM) \cite{shi2015convlstm} is
-a form of RNN that uses convolution as its recurrent operator and thus is able
-to efficiently process a 2D image input and store a 2D hidden state. We
-initialize the hidden state of the ConvLSTM with the FCN output, pad the rest
-of the initial hidden state with zeros, and feed the output segmentation back
-into the ConvLSTM (See Figure~\ref{fig:model_arch}, right). This allows the
-gradient to flow through the ConvLSTM without introducing instability.
-\begin{align}
-\*{d}_t^{\text{clstm}} = \begin{cases}
-                            [\*{x}, \*{0}, ..., \*{0}],   & \text{if } t = 0 \\
-                            \texttt{ConvLSTM}(
-                            \*{d}_{t-1}^{\text{clstm}},
-                            \*{y}_{t-1}),                 & \text{otherwise}
-                         \end{cases}
-\end{align}
+% 2. \textbf{\textit{Convolutional LSTM}}. One issue of the cumulative canvas is
+% that the recurrent connection from the output of the previous time step into
+% the canvas sometimes leads to training instability. In practice, we observe
+% that reducing the gradient flowing back from the input of the canvas aids
+% training. An alternative is to learn the ``addition'' operation with another
+% RNN. Convolutional Long Short-Term Memory (ConvLSTM) \cite{shi2015convlstm} is
+% a form of RNN that uses convolution as its recurrent operator and thus is able
+% to efficiently process a 2D image input and store a 2D hidden state. We
+% initialize the hidden state of the ConvLSTM with the FCN output, pad the rest
+% of the initial hidden state with zeros, and feed the output segmentation back
+% into the ConvLSTM (See Figure~\ref{fig:model_arch}, right). This allows the
+% gradient to flow through the ConvLSTM without introducing instability.
+% \begin{align}
+% \*{d}_t^{\text{clstm}} = \begin{cases}
+%                             [\*{x}, \*{0}, ..., \*{0}],   & \text{if } t = 0 \\
+%                             \text{ConvLSTM}(
+%                             \*{d}_{t-1}^{\text{clstm}},
+%                             \*{y}_{t-1}),                 & \text{otherwise}
+%                          \end{cases}
+% \end{align}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Part B: Box network}
 
-The box network localizes objects of interest. The CNN in the box network
+The box network plays a critical role, localizing the next object of interest. 
+The CNN in the box network
 outputs a $H' \times W' \times L$ feature map $\*{u}_{t}$ ($H'$ is the height;
 $W'$ is the width; $L$ is the feature dimension). CNN activation based on the
 entire image is too complex and inefficient to process simultaneously. Simple
@@ -118,29 +122,36 @@ box, we allow the glimpse LSTM to look at different locations by feeding a
 dimension $L$ vector each time. $\alpha$ is initialized to be uniform over all
 locations, and $\tau$ indexes the glimpses.
 \begin{align}
-\*u_t            &= \texttt{CNN}(\*d_t)                                      \\
-\*z_{t, \tau}    &= \texttt{LSTM}(\*z_{t, \tau-1},
+\*u_t            &= \text{CNN}(\*d_t)                                      \\
+\*z_{t, \tau}    &= \text{LSTM}(\*z_{t, \tau-1},
                     \sum_{h, w} \alpha^{h, w}_{t, \tau} u^{h,w,l}_{t})       \\
 \alpha_{t, \tau} &= \begin{cases}
                     1/(H' \times W'),            & \text{if } \tau = 0       \\
-                    \texttt{MLP}(\*z_{t, \tau}), & \text{otherwise}
+                    \text{MLP}(\*z_{t, \tau}), & \text{otherwise}
                     \end{cases}
 \end{align}
 
-We pass the LSTM's hidden state through a linear layer to obtain predicted
-box coordinates. We parameterize the box by its normalized center
-$(g_X,g_Y)$, and size $(\log \delta_X, \log \delta_Y)$. A scaling factor $\gamma$ is
-also predicted by the linear layer, and used when re-projecting the patch
-to the original image size.
+We pass the LSTM's hidden state through a linear layer to obtain predicted box
+coordinates. We parameterize the box by its normalized center
+$(\tilde{g}_X,\tilde{g}_Y)$, and size $(\log \tilde{\delta}_X, \log
+\tilde{\delta}_Y)$. A scaling factor $\gamma$ is also predicted by the linear
+layer, and used when re-projecting the patch to the original image size.
+% \begin{align}
+% [\tilde{g}_X,
+%  \tilde{g}_Y 
+%  \log \tilde{\delta}_X,
+%  \log \tilde{\delta}_Y, 
+%  \log \sigma_X,
+%  \log \sigma_Y,
+%  \gamma]                  &=  \*{w}_b^\top \*{z}_{t, \text{end}} + \*{w}_{b0}
+% \end{align}
 \begin{align}
-[\tilde{g}_X,
- \tilde{g}_Y 
- \log \tilde{\delta}_X,
- \log \tilde{\delta}_Y, 
- \log \sigma_X,
- \log \sigma_Y,
+[\tilde{g}_{X,Y},
+ \log \tilde{\delta}_{X,Y},
+ \log \sigma_{X,Y},
  \gamma]                  &=  \*{w}_b^\top \*{z}_{t, \text{end}} + \*{w}_{b0}
 \end{align}
+\vspace{-0.4in}
 \begin{align}
 g_X      &= (\tilde{g}_X+1)W/2                                               \\
 g_Y      &= (\tilde{g}_Y+1)H/2                                               \\
@@ -151,7 +162,10 @@ g_Y      &= (\tilde{g}_Y+1)H/2                                               \\
 \textbf{Extracting a sub-region}. We follow DRAW \cite{gregor15draw} and use a
 Gaussian interpolation kernel to extract an $\tilde{H} \times \tilde{W}$ patch
 from the $\tilde{x}$, a concatenation of the original image with
-$\*d_t^{\text{canvas}}$. We used the canvas here for easier pre-training. We
+% $\*d_t^{\text{canvas}}$. 
+$\*d_t$. 
+% We used the canvas here for easier pre-training. 
+We
 further allow the model to output rectangular patches to account for different
 shapes of the object. $i, j$ index the location in the patch of dimension
 $\tilde{H} \times \tilde{W}$, and $a, b$ index the location in the original
@@ -171,9 +185,10 @@ F_Y^{b, j}      &= \frac{1}{\sqrt{2\pi} \sigma_Y}
                    \exp \left(- \frac{(b - \mu_Y^j)^2}{2\sigma_Y^2} \right)
 \end{align}
 \begin{align}
-\tilde{\*x}_t   &= [\*{x}_0, \*{d}_t^{\text{canvas}}]                        \\
-\*p_t           &= \texttt{Extract}(\tilde{\*{x}}_t, F_Y, F_X) 
-            \equiv F_Y^T \tilde{\*{x}}_t F_X
+% \tilde{\*x}_t   &= [\*{x}_0, \*{d}_t^{\text{canvas}}]                      \\
+\tilde{\*x}_t   &= [\*{x}_0, \*{d}_t]                        \\
+\*p_t           &= \text{Extract}(\tilde{\*{x}}_t, F_Y, F_X) 
+            \equiv F_Y^\top \tilde{\*{x}}_t F_X
 \end{align}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -181,26 +196,22 @@ F_Y^{b, j}      &= \frac{1}{\sqrt{2\pi} \sigma_Y}
 \subsection{Part C: Segmentation network}
 
 The remaining task is to segment out the pixels that belong to the dominant
-object within the window. The segmentation network first utilizes a
-convolution network to produce a feature map $\*v_t$. We then adopt a variant
-of the DeconvNet \cite{noh15deconv} with skip connections, which appends
-deconvolution (or convolution transpose) layers to upsample the low-resolution
-feature map to a full-size segmentation. After the fully convolutional layers
-% Mengye - should this be "fully de-convolutional"? 
-% Rich - de-convolution here is still doing convolution (same operator, just
-% transpose the filters. Stride 2 in regular convolution becomes stride 1/2 in
-% deconvolution).
-we get a patch-level segmentation prediction heat map $\tilde{y}_t$. We then
-re-project this patch prediction to the original image using the transpose of
-the previously computed Gaussian filters; the learned $\gamma$ magnifies the
-signal within the bounding box, and a constant $\beta$ suppresses the pixels
-outside the box. Applying the sigmoid function produces final segmentation
-values between 0 and 1.
+object within the window. The segmentation network first utilizes a convolution
+network to produce a feature map $\*v_t$. We then adopt a variant of the
+DeconvNet \cite{noh15deconv} with skip connections, which appends deconvolution
+(or convolution transpose) layers to upsample the low-resolution feature map to
+a full-size segmentation. After the fully convolutional layers we get a
+patch-level segmentation prediction heat map $\tilde{y}_t$. We then re-project
+this patch prediction to the original image using the transpose of the
+previously computed Gaussian filters; the learned $\gamma$ magnifies the signal
+within the bounding box, and a constant $\beta$ suppresses the pixels outside
+the box. Applying the sigmoid function produces segmentation values
+between 0 and 1.
 \begin{align}
-\*v_t         &= \texttt{CNN}(\*p_t)                                         \\
-\tilde{\*y}_t &= \texttt{D-CNN}(\*v_t)                                       \\
-\*y_t         &= \texttt{sigmoid} \left(\gamma \cdot 
-                 \texttt{Extract}(\tilde{\*y}_t, F_Y^\top, F_X^\top)
+\*v_t         &= \text{CNN}(\*p_t)                                         \\
+\tilde{\*y}_t &= \text{D-CNN}(\*v_t)                                       \\
+\*y_t         &= \text{sigmoid} \left(\gamma \cdot 
+                 \text{Extract}(\tilde{\*y}_t, F_Y^\top, F_X^\top)
                  -\beta \right)
 \end{align}
 
@@ -211,16 +222,16 @@ values between 0 and 1.
 To estimate the number of objects in the image, and to terminate our sequential
 process, we incorporate a scoring network, similar to the one presented in
 \cite{romeraparedes15ris}. Our scoring network takes information from the
-hidden states of both the box network ($z_t$) and segmentation network ($v_t$) to
-produce a score between 0 and 1.
+hidden states of both the box network ($\*z_t$) and segmentation network ($\*v_t$)
+to produce a score between 0 and 1.
 \begin{equation}
-s_{t} = \texttt{sigmoid}(\*w_{zs}^\top\*z_{t, \text{end}} + 
+s_{t} = \text{sigmoid}(\*w_{zs}^\top\*z_{t, \text{end}} + 
                          \*w_{vs}^\top\*v_t + \*{w}_{s0})
 \end{equation}
 
 \textbf{Termination condition}. We train the entire model with a sequence
 length determined by the maximum number of objects plus one. During inference,
-we cut off iterations once the output score goes below 0.5. The loss function
+we cut off iterations once the output score goes below 0.5. The score loss function
 (described below) encourages scores to decrease monotonically.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -232,14 +243,16 @@ segmentation matching IoU loss $\mathcal{L}_y$; the box IoU loss
 $\mathcal{L}_b$; and the score cross-entropy loss $\mathcal{L}_s$:
 \begin{equation}
 \mathcal{L}(\*y, \*b, \*s) = \mathcal{L}_y(\*y, \*y^*) + 
-                             \mathcal{L}_b(\*b, \*b^*) + 
-                             \mathcal{L}_s(\*s, \*s^*)
+                             \lambda_b \mathcal{L}_b(\*b, \*b^*) + 
+                             \lambda_s \mathcal{L}_s(\*s, \*s^*)
 \end{equation}
+We fix the loss coefficient $\lambda_b$ and $\lambda_s$ to be 1 for all of our
+experiments.
 
 \textbf{(a) Matching IoU loss (mIOU)}. A primary challenge of instance
-segmentation involves matching model and ground-truth instances.  we compute a
+segmentation involves matching model and ground-truth instances.  We compute a
 maximum-weighted  bipartite graph matching between the output instances and
-ground-truth instances (c.f., \cite{stewart15lstmdet} and 
+ground-truth instances (c.f., \cite{stewart15lstmdet} and
 \cite{romeraparedes15ris}).
 Matching makes the loss insensitive to the ordering of the ground-truth
 instances. Unlike coverage scores proposed in \cite{silberman14insseg} it
@@ -248,11 +261,11 @@ matching weight $\mathcal{M}_{i, j}$ is the IoU score between a pair of
 segmentations. We use the Hungarian algorithm to compute the matching; we
 do not back-propagate the network gradients through this algorithm.
 \begin{align}
-\mathcal{M}_{i, j}        &= \texttt{softIOU}(\*y_i, \*y^*_j) 
+\mathcal{M}_{i, j}        &= \text{softIOU}(\*y_i, \*y^*_j) 
                       \equiv \frac{\sum \*y_i \cdot \*y^*_j}
                              {\sum \*y_i + \*y^*_j - \*y_i \cdot \*y^*_j}    \\
-\mathcal{L}_y(\*y, \*y^*) &= -\texttt{mIOU}(\*y, \*y^*)
-                      \equiv -\frac{1}{N} \sum_{i, j} 
+\mathcal{L}_y(\*y, \*y^*) &= -\text{mIOU}(\*y, \*y^*)                        \\
+                     &\equiv -\frac{1}{N} \sum_{i, j} 
                              \mathcal{M}_{i, j}
                              \mathbbm{1}[\text{match}(\*y_i) = \*y^*_j]
 \end{align}
@@ -261,14 +274,17 @@ do not back-propagate the network gradients through this algorithm.
 4-d box coordinates, its gradient vanishes when two boxes do not overlap, which
 can be problematic for gradient-based  learning. Instead, we propose a soft
 version of the box IoU. We use the same Gaussian filter to re-project a
-constant patch on the original image, pad the ground-truth boxes and compute
+constant patch on the original image, pad the ground-truth boxes, and then compute
 the mIOU between the predicted box and the matched padded ground-truth bounding
 box that is  scaled proportionally in both height and width.
 \begin{align}
-\*b_{t}                   &= \texttt{sigmoid}(\gamma \cdot
-                             \texttt{Extract}(
-                             \mathbf{1}, F_Y^T, F_X^T) - \beta)              \\
-\mathcal{L}_b(\*b, \*b^*) &= -\texttt{mIOU}(\*b, \texttt{Pad}(\*b^*))
+\*b_{t}                   &= \text{sigmoid}(\gamma \cdot
+                             \text{Extract}(
+                             \mathbf{1}, F_Y^\top, F_X^\top) - \beta)
+\end{align}
+\vspace{-0.3in}
+\begin{align}
+\mathcal{L}_b(\*b, \*b^*) &= -\text{mIOU}(\*b, \text{Pad}(\*b^*))
 \end{align}
 
 \textbf{(c) Monotonic score loss}. To facilitate automatic termination, the
@@ -276,37 +292,33 @@ network should output more confident objects first. We formulate a loss
 function that encourages monotonically decreasing values in the score output.
 Iterations with target score 1 are compared to the lower bound of subsequent
 scores, and 0 targets to the upper bound of preceding scores.
-\begin{align}
-\mathcal{L}_s(\*s, \*s^*) &= \frac{1}{T}\sum_t
-                             -s^*_t 
-                             \log\left(\min_{t' \ge t} \{s_{t'}\}\right)
-                             -(1 - s^*_t)
-                             \log\left(1 - \max_{t' \le t} \{s_{t'}\}\right)
-\end{align}
+\begin{equation}
+\begin{split}
+\mathcal{L}_s(\*s, \*s^*) = \frac{1}{T}\sum_t 
+          & -s^*_t \log\left(\min_{t' \ge t} \{s_{t'}\}\right)    \\
+          &-(1 - s^*_t) \log\left(1 - \max_{t' \le t} \{s_{t'}\}\right)
+\end{split}
+\end{equation}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Training procedure and post-processing}
-
+% \subsection{Training procedure and post-processing}
+\subsection{Training procedure}
+\label{sec:postproc}
 \textbf{Bootstrap training}. The box and segmentation networks rely on the
-output of each other to make decisions for the next time-step. Because of the
+output of each other to make decisions for the next time-step. Due to the
 coupled nature of the two networks, we propose a bootstrap training procedure:
 these networks are pre-trained with ground-truth segmentation and boxes, 
 respectively, and in later stages we replace the ground-truth with the model 
 predicted values.
 
 \textbf{Scheduled sampling}. To smooth out the transition between stages, we
-explore the idea of ``scheduled sampling'' \cite{bengio15schedsamp} where we
+explore the idea of ``scheduled sampling'' \cite{bengio15schedsamp}, where we
 gradually remove the reliance on ground-truth segmentation at the input of the
 network. As shown in Figure~\ref{fig:model_arch}, during training there is a
-dynamic switch in the input of the external memory, to utilize either the
+dynamic switch ($\theta_t$) in the input of the external memory, to utilize 
+either the
 maximally overlapping ground-truth instance segmentation, or the  output of the
-network from the previous time step. By the end of the training, the model is
-completely fed with its own output from the previous step,  which is the
-same as running inference.
-
-\textbf{Post-processing}. We truncate segmentation outside the predicted
-foreground mask, fill holes with the labels from the nearest neighboring
-predicted instance, and remove object segmentation of size smaller than 400
-square pixels. We study the effect of post-processing in ablation studies in
-Table~\ref{tab:kitti}.
+network from the previous time step. By the end of the training, the model
+completely relies on its own output from the previous step,  which 
+matches the test-time inference procedure.

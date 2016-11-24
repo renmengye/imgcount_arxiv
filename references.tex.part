@@ -1,5 +1,4 @@
-\begin{small}
+{\small
+\bibliographystyle{ieee}
 \bibliography{references}
-\bibliographystyle{abbrv}
-% \bibliographystyle{ieeetr}
-\end{small}
+}

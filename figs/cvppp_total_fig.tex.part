@@ -20,9 +20,9 @@
 \includegraphics[width=0.09\textwidth]{./figs/cvppp_internal/plant#1_07.png} &
 \includegraphics[width=0.09\textwidth]{./figs/cvppp_internal/plant#1_08.png}}
 
-\begin{figure}
+\begin{figure*}
 \centering
-\resizebox{\columnwidth}{!}{
+\resizebox{0.8\textwidth}{!}{
 \begin{tabular}{ccccccccc}
 \cvpppAttnImg{045} \\
 \cvpppAllImg{045_box} \\
@@ -33,8 +33,6 @@
 
 \caption{An illustration of outputs of different components of our end-to-end
 system, over nine time-steps: Row 1: soft attention  at the current glimpse; 2:
-predicted box; 3: current step segmentation; 4: all segmentations. See
-\url{https://youtu.be/BMVDhTjEfBU} for a video that shows our our instance
-segmentation algorithm in action.}
+predicted box; 3: current step segmentation; 4: all segmentations.}
 
-\end{figure}
+\end{figure*}

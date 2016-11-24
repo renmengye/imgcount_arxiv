@@ -1,0 +1,101 @@
+\begin{table}[t]
+% \begin{minipage}[t]{\textwidth}
+\caption{Ablation results on KITTI validation}
+\label{tab:kitti-ablation}
+\centering
+\begin{small}
+% Resize box start
+% \resizebox{\columnwidth}{!}{
+% \begin{tabular}{l|llllllllll}
+% \toprule
+% \toprule
+%                 & FG IoU   & MWCov    & MUCov    & AvgPr   & AvgRe   & AvgFP     & AvgFN     & InsPr  & InsRe  & InsF1  \\
+% \midrule                                                                                                                            
+% No Box Net      & 75.9     & 46.7     & 37.0     & 81.3    & 61.5    & 0.217     & 0.783     & 40.8   & 35.0   & 37.7   \\
+% No Pre Proc.    & 76.4     & 56.6     & 45.6     & 83.7    & 70.1    & 0.100     & 0.433     & 53.8   & 46.0   & 49.6   \\
+% No Angle        & 78.2     & 72.9     & 62.8     & 82.1    & 72.4    & 0.217     & 0.425     & 78.7   & 73.9   & 76.2   \\
+% No Sched. Samp. & 80.5     & 73.8     & 62.9     & 82.3    & 72.8    & 0.225     & 0.417     & 77.6   & 73.1   & 74.3   \\
+% No Post Proc.   & 79.4     & 73.9     & 64.7     & 65.0    & 89.6    & 0.392     & 0.133     & 64.0   & 76.5   & 70.7   \\
+% \midrule                                                                                                                
+% Full (Canvas)   & 80.5     & 74.7     & 63.3     & 82.4    & 72.7    & 0.192     & 0.442     & 83.8   & 73.1   & 78.1   \\
+% Full (CLSTM)    & 80.6     & 74.8     & 63.9     & 82.2    & 72.7    & 0.217     & 0.450     & 84.1   & 74.4   & 79.0   \\
+% \midrule
+% \midrule                                                                                                                     
+% Iter-1          & 79.1     & 66.9     & 56.3     & 84.3    & 71.2    & 0.133     & 0.458     & 72.4   & 62.8   & 67.3     \\
+% Iter-3          & 80.5     & 73.7     & 62.5     & 82.4    & 72.4    & 0.225     & 0.450     & 80.6   & 71.5   & 75.8     \\
+% Iter-5          & 80.5     & 74.7     & 63.3     & 82.4    & 72.7    & 0.192     & 0.442     & 83.8   & 73.1   & 78.1     \\
+% \bottomrule
+% \end{tabular}
+
+
+% \begin{tabular}{l|llllll}
+% \toprule
+% \toprule
+%                 & MWCov   & MUCov  & AvgFP   & AvgFN    & InsPr  & InsRe \\
+% \midrule                                                                             
+% No Box Net      & 46.7    & 37.0   & 0.217   & 0.783    & 40.8   & 35.0  \\
+% No Pre Proc.    & 56.6    & 45.6   & 0.100   & 0.433    & 53.8   & 46.0  \\
+% No Angle        & 72.9    & 62.8   & 0.217   & 0.425    & 78.7   & 73.9  \\
+% No Sched. Samp. & 73.8    & 62.9   & 0.225   & 0.417    & 77.6   & 73.1  \\
+% No Post Proc.   & 73.9    & 64.7   & 0.392   & 0.133    & 64.0   & 76.5  \\
+% \midrule                                                                 
+% Full (Canvas)   & 74.7    & 63.3   & 0.192   & 0.442    & 83.8   & 73.1  \\
+% Full (CLSTM)    & 74.8    & 63.9   & 0.217   & 0.450    & 84.1   & 74.4  \\
+% \midrule                                                                   
+% \midrule                                                                      
+% Iter-1          & 66.9    & 56.3   & 0.133   & 0.458    & 72.4   & 62.8  \\
+% Iter-3          & 73.7    & 62.5   & 0.225   & 0.450    & 80.6   & 71.5  \\
+% Iter-5          & 74.7    & 63.3   & 0.192   & 0.442    & 83.8   & 73.1  \\
+% \bottomrule
+% \end{tabular}
+% }
+
+
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{l|l|llll}
+\toprule
+\toprule
+                & Set &  MWCov   & MUCov    & AvgFP     & AvgFN     \\
+\midrule                                                         
+No Pre Proc.    & val &  55.6    & 45.0     & 0.125     & 0.417     \\  
+No Box Net      & val &  57.0    & 49.1     & 0.757     & 0.375     \\ 
+No Angle        & val &  71.2    & 63.3     & 0.542     & 0.342     \\
+No Sched. Samp. & val &  73.6    & 63.9     & 0.350     & 0.317     \\
+\midrule                                                         
+Iter-1          & val &  64.1    & 54.8     & 0.200     & 0.375     \\
+Iter-3          & val &  71.3    & 63.4     & 0.417     & 0.308     \\
+\midrule                                                           
+Full (Iter-5)   & val & 75.1     & 64.6     &  0.375    & 0.283     \\
+% \midrule                                                
+% \midrule                                                 
+\bottomrule
+\end{tabular}
+}
+% Resize box end
+\end{small}
+% \end{minipage}
+\end{table}
+
+% \begin{table*}[t]
+% \begin{minipage}[t]{\textwidth}
+% \caption{Ablation results on KITTI vehicle segmentation validation set}
+% \label{tab:kitti}
+% \centering
+% \begin{small}
+% % Resize box start
+% % \resizebox{\textwidth}{!}{
+% \begin{tabular}{l|llllllllll}
+% \toprule
+% \toprule
+%             & FG IoU   & MWCov   & MUCov   & AvgPr  & AvgRe  & AvgFP    & AvgFN    & InsPr    & InsRe    & InsF1    \\
+% \midrule                                                                                                                     
+% Iter-1      & 79.1     & 66.9    & 56.3    & 84.3   & 71.2   & 0.133    & 0.458    & 72.4     & 62.8     & 67.3     \\
+% Iter-3      & 80.5     & 73.7    & 62.5    & 82.4   & 72.4   & 0.225    & 0.450    & 80.6     & 71.5     & 75.8     \\
+% Iter-5      & 80.5     & 74.7    & 63.3    & 82.4   & 72.7   & 0.192    & 0.442    & 83.8     & 73.1     & 78.1     \\
+% \bottomrule
+% \end{tabular}
+% % }
+% % Resize box end
+% \end{small}
+% \end{minipage}
+% \end{table*}

@@ -7,10 +7,10 @@ applications, such as autonomous driving, image captioning, and visual question
 answering. Techniques that combine large graphical models with low-level vision
 have been proposed to address this problem; however,  we propose an end-to-end
 recurrent neural network (RNN) architecture with an attention mechanism to
-model a  human-like counting process, and produce detailed instance
-segmentations.  The network is jointly trained to sequentially produce regions
+model a human-like counting process, and produce detailed instance
+segmentations. The network is jointly trained to sequentially produce regions
 of interest as well as a dominant object segmentation within each region. The
-proposed model achieves state-of-the-art results on the CVPPP leaf segmentation
-dataset \cite{minervini14cvppp} and KITTI vehicle segmentation dataset
-\cite{geiger12kitti}.
+proposed model achieves competitive results on the CVPPP 
+\cite{minervini14cvppp}, KITTI \cite{geiger12kitti}, and Cityscapes
+\cite{cordts16cityscapes} datasets.
 \end{abstract}

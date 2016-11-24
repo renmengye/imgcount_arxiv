@@ -3,15 +3,15 @@
 \includegraphics[width=0.133\textwidth]{./figs/cvppp_gt/plant#1_label.png} &
 \includegraphics[width=0.133\textwidth]{./figs/cvppp_out/plant#1_label.png}}
 
-\begin{figure}
+\begin{figure*}
 \centering
 \begin{small}
-\resizebox{\columnwidth}{!}{
+\resizebox{0.9\textwidth}{!}{
 \begin{tabular}{ccccccc}
 Image & GT & Ours & & Image & GT & Ours \\
 \cvpppImg{029} & & \cvpppImg{137}\\
-\\
-\cvpppImg{042} & & \cvpppImg{119}
+% \\
+% \cvpppImg{042} & & \cvpppImg{119}
 \end{tabular}
 }
 \caption{Examples of our instance segmentation output on CVPPP leaf dataset.
@@ -19,4 +19,4 @@ In this paper, instance colors are determined by the order of the model output
 sequence.}
 \label{fig:cvppp_out}
 \end{small}
-\end{figure}
+\end{figure*}

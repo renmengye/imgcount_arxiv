@@ -1,24 +1,21 @@
 \newcommand{\kittiImg}[1] {
-\includegraphics[width=0.3\textwidth]{./figs/kitti_img/#1.png} &
-\includegraphics[width=0.3\textwidth]{./figs/kitti_gt/#1.png} &
+\includegraphics[width=0.3\textwidth]{./figs/kitti_img/#1.png} & &
+\includegraphics[width=0.3\textwidth]{./figs/kitti_gt/#1.png} & &
 \includegraphics[width=0.3\textwidth]{./figs/kitti_out/#1.png}}
 
-\begin{figure}
+\begin{figure*}
 \centering
 \begin{small}
-\resizebox{\columnwidth}{!}{
-\begin{tabular}{ccc}
-Image & GT & Ours \\
+\resizebox{0.9\textwidth}{!}{
+\begin{tabular}{ccccc}
+Image && GT && Ours \\
 \kittiImg{002142} \\
-\\
 \kittiImg{001415} \\
-\\
-\kittiImg{005057} \\
-\\
+% \kittiImg{005057} \\
 \kittiImg{004369} \\
 \end{tabular}
 }
 \caption{Examples of our instance segmentation output on KITTI.}
 \label{fig:kitti_out}
 \end{small}
-\end{figure}
+\end{figure*}

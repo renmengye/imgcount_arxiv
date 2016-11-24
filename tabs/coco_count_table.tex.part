@@ -1,0 +1,32 @@
+\vspace{.1in}
+\begin{table}
+% \begin{minipage}[t]{.5\textwidth}
+\begin{minipage}[t]{\textwidth}
+\caption{Counting performance on MS-COCO}
+\label{tab:coco-count}
+\centering
+\begin{small}
+\begin{tabular}{l|llll}
+\toprule
+\toprule
+                             & Class  & MWCov \u & $|$DiC$|$ \d & Acc. \u    \\
+\midrule
+detect
+\cite{chattopadhyay16count}  & Person & -        & 3.22         & -          \\
+aso-sub
+\cite{chattopadhyay16count}  & Person & -        & \*{1.36}     & -          \\
+\midrule
+Ours                         & Person & 60.3     & 1.71         & 0.47       \\
+\midrule
+\midrule
+detect
+\cite{chattopadhyay16count}  & Zebra  & -        & 2.56         & -          \\
+aso-sub
+\cite{chattopadhyay16count}  & Zebra  & -        & 1.03         & -          \\
+\midrule
+Ours                         & Zebra  & 83.2     & \*{0.34}     & 0.82       \\
+\bottomrule
+\end{tabular}
+\end{small}
+\end{minipage}
+\end{table}

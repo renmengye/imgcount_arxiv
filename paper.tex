@@ -1,41 +1,55 @@
-\documentclass{article}
-\pdfoutput=1
+\documentclass[10pt,twocolumn,letterpaper]{article}
+% \pdfoutput=1
 
-\usepackage{hyperref}                           % hyperlinks
+\usepackage{cvpr}
+\usepackage{times}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
 \usepackage{url}                                % simple URL typesetting
 \usepackage{booktabs}                           % professional-quality tables
-\usepackage{amsmath}                            % maths
+% \usepackage{amsmath}                            % maths
 \usepackage{amsfonts}                           % blackboard math symbols
 \usepackage{nicefrac}                           % compact symbols for 1/2, etc.
 \usepackage{microtype}                          % microtypography
-\usepackage{graphicx}                           % graphs
 \usepackage[font=small,labelfont=bf]{caption}   % caption
 \usepackage{bbm}                                % indicator
 \usepackage{wrapfig}                            % wrap figure
 \usepackage{color}                              % color text
-\usepackage{fullpage}
+\usepackage[pagebackref=true,breaklinks=true,letterpaper=true,colorlinks,bookmarks=false]{hyperref}
+
+% \usepackage{fullpage}
 \renewcommand{\*}[1]{\textbf{#1}}               % bold
 \renewcommand{\u}{$\uparrow$}
 \renewcommand{\d}{$\downarrow$}
-\renewcommand{\r}[1]{\textcolor{red}{#1}}
 \renewcommand{\b}[1]{\textcolor{blue}{#1}}
-\setlength{\parindent}{0em}                     % Paragraph spacing.
-\setlength{\parskip}{1em}                       % Paragraph spacing.
+\newcommand{\mengye}[1]{{\color{red}{#1}}}
+\newcommand{\cut}[1]{}
 
-\title{End-to-End Instance Segmentation and Counting with Recurrent Attention}
+\cvprfinalcopy % *** Uncomment this line for the final submission
+
+\def\cvprPaperID{3051} % *** Enter the CVPR Paper ID here
+\def\httilde{\mbox{\tt\raisebox{-.5ex}{\symbol{126}}}}
+
+% Pages are numbered in submission mode, and unnumbered in camera-ready
+\ifcvprfinal\pagestyle{empty}\fi
+\begin{document}
+\title{End-to-End Instance Segmentation with Recurrent Attention}
 
 \author{
-    Mengye Ren \\
-    University of Toronto \\
-    \texttt{mren@cs.toronto.edu} \\
-    \and
-    Richard S. Zemel \\
-    University of Toronto \\
-    Canadian Institute for Advanced Research \\
-    \texttt{zemel@cs.toronto.edu} \\
+    Mengye Ren${}^1$, Richard S. Zemel${}^{1,2}$ \\
+    University of Toronto${}^1$, Canadian Institute for Advanced Research${}^2$ \\
+    {\tt \small \{mren,zemel\}@cs.toronto.edu} \\
+    % \and
+    % Richard S. Zemel \\
+    % University of Toronto \\
+    %  \\
+    % {\tt \small \{mren,zemel\}@cs.toronto.edu} \\
 }
 
-\begin{document}
+%\thispagestyle{empty}
 \maketitle
 \input{abstract.tex.part}
 \input{figs/cvppp_total_fig.tex.part}
@@ -45,6 +59,6 @@
 \input{experiments.tex.part}
 \input{conclusion.tex.part}
 \input{references.tex.part}
-\newpage
+% \newpage
 \input{appendix.tex.part}
 \end{document}

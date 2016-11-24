@@ -1,117 +1,262 @@
 \section{Experiments}
 
+\subsection{Datasets \& Evaluation}
+
 \textbf{CVPPP leaf segmentation}. One instance segmentation benchmark is the
 CVPPP plant leaf dataset \cite{minervini14cvppp}, which was developed due to
 the importance of instance segmentation in plant phenotyping. We ran the A1
 subset of CVPPP plant leaf segmentation dataset. We trained our model on 128
-labelled images, and report results on the 33 test images. We compare our
+labeled images, and report results on the 33 test images. We compare our
 performance to \cite{romeraparedes15ris}, and other top approaches that were
 published with the CVPPP conference; see the collation study
 \cite{scharr16leaf} for details of these  other approaches.
 
+\input{figs/cvppp_fig.tex.part}
+\input{figs/coco_zebra_fig.tex.part}
+
 \textbf{KITTI car segmentation}. Instance segmentation also provides rich
 information in the context of autonomous driving. Following
 \cite{zhang15insseg, zhang16insseg, uhrig16insseg}, we also evaluated the model
-performance on KITTI car segmentation dataset. We trained the model with 3712
-training images, and report performance on 144 test images. We also examine the
-relative importance of model components via ablation studies.
+performance on the KITTI car segmentation dataset. We trained the model 
+with 3,712 training images, and report performance on 120 validation images and
+144 test images. 
 
-\textbf{MS-COCO counting}. Additionally, we train class specific models on MS-
-COCO and test counting performance on the results. We chose ``person'' and
-``zebra'' because these are the two of the most common classes in VQA
-questions. We report counting performance on images with at least one instance
-of the class: 677 zebra images, and 21,634 ``person'' images.
+\textbf{Cityscapes}. Cityscapes provides multi-class instance-level annotation
+and is currently the most comprehensive benchmark for instance segmentation,
+containing 2,975 training images, 500 validation images, and 1,525 test 
+images, with 8 semantic classes (person, rider, car, truck, bus, train, 
+motorcycle, bicycle). We train our instance segmentation network as a 
+class-agnostic model for all classes, and apply a semantic segmentation mask 
+obtained from \cite{ghiasi16lrr} on top of our instance output.
+Since ``car'' is the most common class, we report both 
+average score on all classes, and individual score on the ``car'' class.
+
+\textbf{MS-COCO}. In order to test the effectiveness and
+portability of our algorithm, we train our model on a subset of
+MS-COCO. As an initial study we select images of zebras, and train on 1000
+images.
+Since there are no methods that are directly comparable, we leave the 
+quantatitive results for Appendix \ref{sec:more_exp}.
+
+\textbf{Ablation studies}. We also examine the relative importance of model
+components via ablation studies, and report validation performance on the KITTI
+dataset.
+\begin{itemize}
+\item \textbf{No pre-processing}. This network is trained to take as input raw 
+image pixels, without the foreground segmentation or the angle map.
+\vspace{-0.1in}
+\item \textbf{No box net}. Instead of predicting segmentation within a box, the
+output dimension of the segmentation network is the full image.
+\vspace{-0.1in}
+\item \textbf{No angles}. The pre-processor predicts the foreground segmentation
+only, without the angle map.
+\vspace{-0.1in}
+\item \textbf{No scheduled sampling}. This network has the same architecture 
+but trained without scheduled sampling (see Section~\ref{sec:postproc}), i.e.,
+at training time, always use the maximum overlapped ground-truth.
+\vspace{-0.1in}
+\item \textbf{Fewer iterations}. The box network has fewer glimpses on
+the convnet feature map (fewer LSTM iterations).
+\end{itemize}
 
 \input{tabs/cvppp_table.tex.part}
-\input{figs/cvppp_fig.tex.part}
-\input{tabs/kitti_table.tex.part}
-\input{figs/kitti_fig.tex.part}
-\input{count_fig.tex.part}
+\input{tabs/cityscapes_table.tex.part}
 
-\textbf{Evaluation metrics}. We report the  metrics used by the other studies
-in the respective benchmarks: symmetric best dice (SBD) for leaf segmentation
-(see Equations~\ref{eq:bd}, \ref{eq:sbd}) and mean (weighted) coverage (MWCov,
-MUCov) for car segmentation (see Equations~\ref{eq:mwcov}, \ref{eq:mucov}). The
-coverage scores measure the instance-wise IoU for each ground-truth instance
-averaged over the image; MWCov further weights the score by the size of the
-ground-truth instance segmentation (larger objects get larger weights).
+\textbf{Evaluation metrics}. We evaluate based on the  metrics used by the 
+other studies in the respective benchmarks. 
+See the Supp. Material for detailed equations for these metrics.
+
+For segmentation, symmetric best dice (SBD) is used
+for leaves,
+(see Equations~\ref{eq:bd}, \ref{eq:sbd}).
+% (see Supp. Material and \cite{scharr16leaf} for detailed equations).
 \begin{align}
 \label{eq:bd}
-\texttt{DICE}(A, B)                &= \frac{2 |A \cup B|}{|A| + |B|}      \\
-\texttt{BD}(\{A_i\}, B)            &= \max_{i} \texttt{DICE}(A_i, B)      \\
-\label{eq:sbd}
-\texttt{SBD}(y_i\}, \{y^*_j\})     &= \frac{1}{N} \min \left(
-                                      \sum_j 
-                                      \texttt{BD}(\{y_i\}, y^*_j),
-                                      \sum_i
-                                      \texttt{BD}(\{y^*_j\}, y_i) \right) \\
-\label{eq:mucov}
-\texttt{MUCov}(\{y_i\}, \{y_j^*\}) &= \frac{1}{N} \sum_i 
-                                      \max_j \texttt{IoU}(y_i, y_j^*)     \\
-\label{eq:mwcov}
-\texttt{MWCov}(\{y_i\}, \{y_j^*\}) &= \frac{1}{N} \sum_i 
-                                      \frac{|y_i|}{\sum_i |y_i|}
-                                      \max_j \texttt{IoU}(y_i, y_j^*)
+\text{DICE}(A, B)                &= \frac{2 |A \cup B|}{|A| + |B|}    \\
+\text{BD}(\{A_i\}, B)            &= \max_{i} \text{DICE}(A_i, B)
 \end{align}
+\begin{equation}
+\begin{split}
+\label{eq:sbd}
+\text{SBD}(y_i\}, \{y^*_j\})     = \min (
+                                    & \frac{1}{N} \sum_j 
+                                    \text{BD}(\{y_i\}, y^*_j),        \\
+                                    & \frac{1}{N} \sum_i
+                                    \text{BD}(\{y^*_j\}, y_i) )
+\end{split}
+\end{equation}
+Mean (weighted) coverage (MWCov, MUCov) are used for KITTI car segmentation,
+(see Equations~\ref{eq:mwcov}, \ref{eq:mucov}). 
+%(see Supp. Material, \cite{zhang16insseg}).
+The coverage scores measure the instance-wise IoU for each ground-truth 
+instance averaged over the image; MWCov further weights the score by the size 
+of the ground-truth instance segmentation (larger objects get larger weights).
+\begin{align}
+\label{eq:mucov}
+\text{MUCov}(\{y_i\}, \{y_j^*\}) &= \sum_i \frac{1}{N} 
+                                    \max_j \text{IoU}(y_i, y_j^*)     \\
+\label{eq:mwcov}
+\text{MWCov}(\{y_i\}, \{y_j^*\}) &= \sum_i w_{\text{cov},i} 
+                                    \max_j \text{IoU}(y_i, y_j^*)     \\
+               w_{\text{cov},i}  &= \frac{|y_i|}{\sum_i |y_i|}
+\end{align}
+The Cityscapes evaluation uses average precision (AP),
+(see Equation~\ref{eq:ap}),
+%(see \cite{cordts16cityscapes}),
+which counts the precision between a pair of matched prediction and 
+groundtruth, for a range of IoU threshold values.
+\begin{equation}
+\begin{split}
+\label{eq:ap}
+\text{AP}(\{y_i\}, \{y_j^*\}) = &\max_s \sum_\theta \sum_j
+                                Pr(y_{s(i)}, y_j) \cdot \\
+                                &\mathbbm{1}
+                                [\text{IoU}(y_{s(i)}, y^*_j) \ge \theta],
+\end{split}
+\end{equation}
+where $s$ is a function that permutes the predicted instance order, and 
+$\theta$ is the threshold from 0.5 to 0.95. 
+Other scores include 
+AP$^\text{50\%}$ for a threshold of $0.5$, and AP$^\text{50m, 100m}$ for a 
+subset of instances within 50m and 100m.
 
-Counting is measured in absolute difference in count (\texttt{|DiC|}) (see
-Equation~\ref{eq:dic}), average false positive (\texttt{AvgFP}), and average
-false negative (\texttt{AvgFN}). False positive is the number of predicted
+Counting is measured in absolute difference in count ($|\text{DiC}|$) 
+(i.e., mean absolute error), (see Equation~\ref{eq:dic}), 
+average false positive (\text{AvgFP}), and average
+false negative (\text{AvgFN}). False positive is the number of predicted
 instances that do not overlap with the ground-truth, and false negative is the
 number of  ground-truth instances that do not overlap with the prediction.
 \begin{align}
 \label{eq:dic}
-\texttt{|DiC|} = \frac{1}{N}\sum_i |count_i - count_i^*|
+|\text{DiC}| = \frac{1}{N}\sum_i |count_i - count_i^*|
 \end{align}
 
-\subsection{Results \& discussion}
-In the leaf segmentation task, our best model outperforms the previous 
-state-of-the-art by a large margin in both segmentation and counting.
-Table~\ref{tab:cvppp} shows that the models with FCN overfit and 
-scores lower than the simpler version. This is sensible as the dataset size
-is small, and including the FCN significantly increases the input dimension and
-number of parameters.
+\input{tabs/kitti_table.tex.part}
+\input{tabs/kitti_ablation_table.tex.part}
 
-In the car segmentation task, our model achieves the state-of-the-art MWCov
-shown in Table~\ref{tab:kitti}, but our MUCov is lower than results reported by
-Uhrig et al. \cite{uhrig16insseg}. One possible explanation is their inclusion
+\input{figs/cityscapes_fig.tex.part}
+\input{figs/kitti_fig.tex.part}
+
+\subsection{Results \& Discussion}
+
+Example results on the leaf segmentation task are shown in
+Figure~\ref{fig:cvppp_out}. On this task, our best model outperforms the
+previous state-of-the-art by a large margin in both segmentation and counting
+(see Table~\ref{tab:cvppp}). In particular, our method has significant 
+improvement over
+a previous RNN-based instance segmentation method \cite{romeraparedes15ris}.
+We found that our model with the FCN pre-processor overfit on this
+task, and we thus utilized the simpler version without input pre-processing.
+This is not surprising, as the dataset is very small, and including the FCN
+significantly increases the input dimension and number of parameters.
+
+On the KITTI task, Figure~\ref{fig:kitti_out} shows that our model can segment
+cars in a wide variety of poses. 
+Our method out-performs \cite{zhang15insseg,zhang16insseg}, but scores lower than 
+\cite{uhrig16insseg} (see Table~\ref{tab:kitti}). 
+One possible explanation is their inclusion
 of depth information during training, which may help the model disambiguate
 distant object boundaries. Moreover, their bottom-up ``instance fusion'' method
 plays a crucial role (omitting this leads to a steep performance drop); this
 likely helps segment smaller objects, whereas our box network does not reliably
-detect distant cars.
+detect distant cars. 
 
-In the zebra counting task, we found that our model outperforms the detector
-and NMS method, and associative-subitizing methods~\cite{chattopadhyay16count},
-but we are not doing as well in the person category. However, relative to these
-regression-based methods, our model permits insight into the recognition of
-each instance by inspecting the output segmentation. Figure~\ref{fig:count}
-shows the relation between counting performance and number of instances. Mean
-absolute difference in count is around 1 for up to 18 leaves, 7 cars, 7 zebras
-and 3 people.
+On Cityscapes, a more challenging and 
+comprehensive benchmark, our system scores much higher than
+\cite{uhrig16insseg} (see Table~\ref{tab:city}). 
+Figure~\ref{fig:cityscapes_out} shows that our model generalizes to a variety
+of object types and shapes, using one single shared network
+for all object classes. 
+% Figure~\ref{fig:coco_zebra_out} further shows that our model can generaliez
 
-In Figure \ref{fig:count}, instead of having a linear relation between counting
-error and groundtruth count, as appeared in most regression based model, our
-model is making much less errors in the low count regime in all four datasets,
-reflecting the nature of our iterative counting method, which delivers higher
-counting accuracy for small number of objects. Note that since our model is not
-trained to directly output the total count, but instead jointly with pixel-
-based loss function, it might give larger overall errors due to the model bias.
+The displayed segmentations demonstrate that our top-down attentional inference is
+crucial for a good instance recognition model. This allows disconnected
+components belonging to objects such as a bicycle 
+(Figure~\ref{fig:cityscapes_out} middle)
+to be recognized as a whole
+piece 
+whereas \cite{zhang16insseg} models the connectedness as their energy potential. 
+Our model also shows impressive results in heavily occluded scenes, when only
+small proportion of the car is visible (Figure~\ref{fig:cityscapes_out} top), 
+and
+when the zebra in the back reveals two disjoint pieces of its body 
+(Figure~\ref{fig:coco_zebra_out} right).
+Another advantage is that our model directly outputs the final
+segmentation, eliminating the need for post-processing, which is often
+required by other methods (e.g. \cite{liang15pfinsseg, uhrig16insseg}).
 
-From Figures \ref{fig:cvppp_out}, \ref{fig:kitti_out},
-\ref{fig:coco_person_out}, \ref{fig:coco_zebra_out} we see our model is
-handling a significant amount of object occlusion and truncation. We verified
-that the external memory helps with the counting process as the network first
-segments the more salient objects and then accounts for the occluded instances.
-In addition, our segmentation network can handle a range of object sizes
-because of the design of the box network.
+Our method also learns to rank the importance of instances 
+through visual attention. During training, the model first attended to objects 
+in a spatial ordering (e.g. left to right), and then gradually shifted
+to a more sophisticated ordering based on confidence, with larger 
+attentional jumps in between timesteps. In the figures, the instance colors 
+are determined by the model output sequence: red, yellow, green, blue, 
+purple, etc.
 
-We found that using scheduled sampling results in much better performance. It
-helps by making training resemble testing, gradually forcing the model to carry
-out a full sequence during training instead of relying on ground-truth input.
-Finally, the convolutional and attentional architecture significantly reduces
-the number of parameters (around 9M) and the performance is quite strong
-despite being trained with only 100 leaf images and 1000 zebra images.
+Some failure cases of our approach, e.g., omitting distant objects and
+under-segmentation, may be explained by our downsampling factor; to
+manage training time, we down-sample KITTI and Cityscapes by a factor
+around 4, whereas \cite{uhrig16insseg} does not do any any downsampling. 
+We also observe a lack of higher-order reasoning, e.g., the inclusion of
+the ``third'' limb of a person in the bottom of 
+Figure~\ref{fig:cityscapes_out}.
+As future work, these problems can be addressed by a combination of our method 
+with bottom-up merging methods (e.g. \cite{liang15pfinsseg,uhrig16insseg}) and 
+higher order graphical models (e.g. \cite{nguyen14highcrf,eslami16shapebm}).
 
-\input{figs/coco_person_fig.tex.part}
-\input{figs/coco_zebra_fig.tex.part}
+Finally, our ablation studies (see Table~\ref{tab:kitti-ablation}) help
+elucidate the contribution of some model components. 
+The initial foreground segmentation, and the box network both play crucial
+roles in the segmentation performance, as seen in the coverage measures.
+Scheduled sampling results in slightly better performance, by making
+training resemble testing, gradually forcing the model to carry out a full
+sequence during training instead of relying on ground-truth input. 
+% Post-processing mostly appears to reduce the number of false positives, likely
+% by removing the instances occupying few pixels.
+Larger numbers of glimpses of the LSTM (Iter-$n$) helps the model significantly
+by allowing more information to be considered before outputting the next
+region of interest.
+Finally, we note that KITTI has a fairly small validation and
+test set, so these results are highly variable. This can be seen in the
+difference in our full model's performance on these sets (last lines of Table
+\ref{tab:kitti-ablation} versus Table \ref{tab:kitti}).
+
+%\mengye{
+%}
+% In the KITTI task, Figure~\ref{fig:kitti_out} shows that our
+% model can segment cars in a wide variety of poses. It achieves state-of-the-art 
+% results (see  Table~\ref{tab:kitti}) across several of the relevant measures,
+% including IoU, weighted coverage, and false positives.
+% Note however that our MUCov is lower than results reported by
+% Uhrig et al. \cite{uhrig16insseg}. 
+
+% In MS-COCO images, our model is able to learn to segment instances of the two
+% specific classes, zebra and humans, in some challenging instances. In
+% Figures~\ref{fig:coco_person_out}, \ref{fig:coco_zebra_out} we see that our
+% model is handling a significant amount of object occlusion and truncation. We
+% verified that the external memory helps with the counting process as the
+% network first segments the more salient objects and then accounts for the
+% occluded instances. In addition, our segmentation network can handle a range of
+% object sizes because of the design of the box network.
+
+% With respect to the counting task, Table~\ref{tab:coco-count} shows that our
+% model outperforms the detector and NMS method, and associative-subitizing
+% methods~\cite{chattopadhyay16count} in the zebra category, but not as well in
+% the person category. It is not surprising that a method trained directly to
+% estimate the number of objects can out-perform our model, which is trained to
+% optimize the segmentation rather than the total count. However, relative to
+% these regression-based methods, our model permits insight into the recognition
+% of each instance by inspecting the output segmentation.
+
+% \input{figs/coco_person_fig.tex.part}
+% \input{figs/coco_zebra_fig.tex.part}
+% \input{tabs/coco_count_table.tex.part}
+% \input{count_fig.tex.part}
+
+% We obtain further insight into the counting task by examining
+% Figure~\ref{fig:count} on the relation of counting error and the ground-truth
+% count. Instead of having a linear relation between the two, as is common in
+% regression-based models, our model is making many fewer errors in the low count
+% regime in all four datasets, reflecting the nature of our iterative counting
+% method. This is arguably preferable, as errors in smaller counts are likely
+% more significant.

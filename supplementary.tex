@@ -1,0 +1,56 @@
+\documentclass[10pt,twocolumn,letterpaper]{article}
+% \pdfoutput=1
+
+\usepackage{cvpr}
+\usepackage{times}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usepackage{url}                                % simple URL typesetting
+\usepackage{booktabs}                           % professional-quality tables
+% \usepackage{amsmath}                            % maths
+\usepackage{amsfonts}                           % blackboard math symbols
+\usepackage{nicefrac}                           % compact symbols for 1/2, etc.
+\usepackage{microtype}                          % microtypography
+\usepackage[font=small,labelfont=bf]{caption}   % caption
+\usepackage{bbm}                                % indicator
+\usepackage{wrapfig}                            % wrap figure
+\usepackage{color}                              % color text
+\usepackage[pagebackref=true,breaklinks=true,letterpaper=true,colorlinks,bookmarks=false]{hyperref}
+
+% \usepackage{fullpage}
+\renewcommand{\*}[1]{\textbf{#1}}               % bold
+\renewcommand{\u}{$\uparrow$}
+\renewcommand{\d}{$\downarrow$}
+\renewcommand{\b}[1]{\textcolor{blue}{#1}}
+\newcommand{\mengye}[1]{{\color{red}{#1}}}
+\newcommand{\cut}[1]{}
+
+% \cvprfinalcopy % *** Uncomment this line for the final submission
+
+\def\cvprPaperID{3051} % *** Enter the CVPR Paper ID here
+\def\httilde{\mbox{\tt\raisebox{-.5ex}{\symbol{126}}}}
+
+% Pages are numbered in submission mode, and unnumbered in camera-ready
+\ifcvprfinal\pagestyle{empty}\fi
+\begin{document}
+\title{Supplementary Material for ``End-to-End Instance Segmentation with Recurrent Attention''}
+
+\author{
+    Mengye Ren \\
+    University of Toronto \\
+    {\tt \small mren@cs.toronto.edu} \\
+    \and
+    Richard S. Zemel \\
+    University of Toronto \\
+    Canadian Institute for Advanced Research \\
+    {\tt \small zemel@cs.toronto.edu} \\
+}
+
+%\thispagestyle{empty}
+\maketitle
+\input{appendix.tex.part}
+\input{references.tex.part}
+\end{document}
