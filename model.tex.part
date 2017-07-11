@@ -295,8 +295,8 @@ scores, and 0 targets to the upper bound of preceding scores.
 \begin{equation}
 \begin{split}
 \mathcal{L}_s(\*s, \*s^*) = \frac{1}{T}\sum_t 
-          & -s^*_t \log\left(\min_{t' \ge t} \{s_{t'}\}\right)    \\
-          &-(1 - s^*_t) \log\left(1 - \max_{t' \le t} \{s_{t'}\}\right)
+          & -s^*_t \log\left(\min_{t' \le t} \{s_{t'}\}\right)    \\
+          &-(1 - s^*_t) \log\left(1 - \max_{t' \ge t} \{s_{t'}\}\right)
 \end{split}
 \end{equation}
 
